@@ -67,10 +67,6 @@
             white-space: nowrap;
         }
 
-        nav a:hover {
-            text-decoration: underline;
-        }
-
         .container {
             max-width: 1200px;
             margin: 25px auto;
@@ -89,7 +85,6 @@
             width: 100%;
             height: 350px;
             object-fit: cover;
-            background: #ddd;
         }
 
         .destaque-conteudo {
@@ -126,18 +121,12 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,.08);
-            transition: transform .2s;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
         }
 
         .card img {
             width: 100%;
             height: 190px;
             object-fit: cover;
-            background: #ddd;
         }
 
         .card-conteudo {
@@ -155,10 +144,16 @@
             line-height: 1.5;
         }
 
+        .conteudo {
+            margin-top: 12px;
+            line-height: 1.6;
+            color: #444;
+        }
+
         .data {
             font-size: 13px;
             color: #888;
-            margin-top: 12px;
+            margin-top: 15px;
         }
 
         footer {
@@ -169,17 +164,9 @@
             padding: 30px 20px;
         }
 
-        footer p {
-            margin: 8px;
-        }
-
         @media (max-width: 800px) {
             .grid {
                 grid-template-columns: 1fr 1fr;
-            }
-
-            h1 {
-                font-size: 26px;
             }
         }
 
@@ -209,6 +196,7 @@
 <header>
 
     <div class="topo">
+
         <div class="logo">
             DIÁRIO DA <span>NOTÍCIA</span>
         </div>
@@ -216,6 +204,7 @@
         <div>
             📰 Informação em primeiro lugar
         </div>
+
     </div>
 
     <nav>
@@ -232,17 +221,20 @@
 
 </header>
 
+
 <main class="container">
 
     <section class="destaque">
 
         <img
             src="https://images.unsplash.com/photo-1504711434969-e33886168f5c"
-            alt="Notícias">
+            alt="Diário da Notícia">
 
         <div class="destaque-conteudo">
 
-            <div class="categoria">Destaque</div>
+            <div class="categoria">
+                Destaque
+            </div>
 
             <h1>
                 Diário da Notícia: informação, credibilidade e notícias em tempo real
@@ -264,23 +256,60 @@
 
     <section class="grid">
 
+        {% for noticia in noticias %}
+
         <article class="card">
 
-            <img
-                src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620"
-                alt="Política">
+            {% if noticia.categoria == "Esportes" %}
+
+                <img
+                    src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2"
+                    alt="{{ noticia.titulo }}">
+
+            {% elif noticia.categoria == "Política" %}
+
+                <img
+                    src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620"
+                    alt="{{ noticia.titulo }}">
+
+            {% elif noticia.categoria == "Brasil" %}
+
+                <img
+                    src="https://images.unsplash.com/photo-1495020689067-958852a7765e"
+                    alt="{{ noticia.titulo }}">
+
+            {% else %}
+
+                <img
+                    src="https://images.unsplash.com/photo-1504711434969-e33886168f5c"
+                    alt="{{ noticia.titulo }}">
+
+            {% endif %}
+
 
             <div class="card-conteudo">
 
-                <div class="categoria">Política</div>
+                <div class="categoria">
+                    {{ noticia.categoria }}
+                </div>
 
                 <h2>
-                    Principais notícias da política do Piauí
+                    {{ noticia.titulo }}
                 </h2>
 
                 <p>
-                    Confira as principais informações e acontecimentos da política piauiense.
+                    {{ noticia.resumo }}
                 </p>
+
+
+                {% if noticia.conteudo %}
+
+                <div class="conteudo">
+                    {{ noticia.conteudo }}
+                </div>
+
+                {% endif %}
+
 
                 <div class="data">
                     Diário da Notícia
@@ -290,62 +319,28 @@
 
         </article>
 
+        {% endfor %}
 
-        <article class="card">
+    </section>
 
-            <img
-                src="https://images.unsplash.com/photo-1495020689067-958852a7765e"
-                alt="Notícias">
-
-            <div class="card-conteudo">
-
-                <div class="categoria">Piauí</div>
-
-                <h2>
-                    Notícias das cidades piauienses
-                </h2>
-
-                <p>
-                    Informação sobre os acontecimentos que movimentam as cidades do Piauí.
-                </p>
-
-                <div class="data">
-                    Diário da Notícia
-                </div>
-
-            </div>
-
-        </article>
+</main>
 
 
-        <article class="card">
+<footer>
 
-            <img
-                src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2"
-                alt="Esportes">
+    <p>
+        <strong>DIÁRIO DA NOTÍCIA</strong>
+    </p>
 
-            <div class="card-conteudo">
+    <p>
+        Informação e credibilidade.
+    </p>
 
-                <div class="categoria">Esportes</div>
+    <p>
+        © 2026 Diário da Notícia
+    </p>
 
-                <h2>
-                    Últimas notícias do esporte no Piauí
-                </h2>
+</footer>
 
-                <p>
-                    Acompanhe as principais notícias esportivas.
-                </p>
-
-                <div class="data">
-                    Diário da Notícia
-                </div>
-
-            </div>
-
-        </article>
-
-
-        <article class="card">
-
-            <img
-                src="https://images.unsplash.com/photo-1503676260728-
+</body>
+</html>
