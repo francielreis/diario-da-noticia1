@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Administração | Diário da Notícia</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f3f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            padding: 35px 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #c40000;
+            margin: 0;
+            font-size: 27px;
+        }
+
+        .logo p {
+            color: #666;
+            margin-top: 8px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 18px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #c40000;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #990000;
+        }
+
+        .erro {
+            background: #ffe5e5;
+            color: #b00000;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        .voltar {
+            text-align: center;
+            margin-top: 22px;
+        }
+
+        .voltar a {
+            color: #555;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login">
+
+    <div class="logo">
+        <h1>DIÁRIO DA NOTÍCIA</h1>
+        <p>Painel Administrativo</p>
+    </div>
+
+    {% if erro %}
+        <div class="erro">{{ erro }}</div>
+    {% endif %}
+
+    <form method="POST">
+
+        <label>Usuário</label>
+        <input
+            type="text"
+            name="usuario"
+            placeholder="Digite seu usuário"
+            required
+        >
+
+        <label>Senha</label>
+        <input
+            type="password"
+            name="senha"
+            placeholder="Digite sua senha"
+            required
+        >
+
+        <button type="submit">
+            ENTRAR
+        </button>
+
+    </form>
+
+    <div class="voltar">
+        <a href="/">← Voltar para o portal</a>
+    </div>
+
+</div>
+
+</body>
+</html>
