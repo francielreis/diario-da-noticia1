@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Painel Administrativo | Diário da Notícia</title>
 
     <style>
@@ -56,7 +57,11 @@
             border-radius: 10px;
             text-decoration: none;
             color: #222;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
         }
 
         .card span {
@@ -111,24 +116,28 @@
 
     <div class="grid">
 
-        <a class="card" href="#">
+        <!-- NOVA NOTÍCIA -->
+        <a class="card" href="/admin/nova-noticia">
             <span>➕</span>
             <h3>Nova notícia</h3>
             <p>Publique uma nova matéria no portal.</p>
         </a>
 
+        <!-- GERENCIAR NOTÍCIAS -->
         <a class="card" href="#">
             <span>📰</span>
             <h3>Gerenciar notícias</h3>
             <p>Edite ou exclua notícias publicadas.</p>
         </a>
 
+        <!-- PATROCINADORES -->
         <a class="card" href="#">
             <span>📢</span>
             <h3>Patrocinadores</h3>
             <p>Cadastre banners e anúncios.</p>
         </a>
 
+        <!-- IMAGENS -->
         <a class="card" href="#">
             <span>🖼️</span>
             <h3>Imagens</h3>
