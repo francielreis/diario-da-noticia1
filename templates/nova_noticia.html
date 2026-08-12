@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Nova Notícia - Diário da Notícia</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+        }
+
+        header {
+            background: #c90000;
+            color: white;
+            padding: 25px 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        header p {
+            margin-bottom: 0;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .formulario {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px #ccc;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 18px;
+            margin-bottom: 7px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 16px;
+        }
+
+        textarea {
+            min-height: 180px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 15px;
+            border: none;
+            border-radius: 7px;
+            background: #c90000;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .voltar {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>DIÁRIO DA NOTÍCIA</h1>
+    <p>Painel Administrativo</p>
+</header>
+
+<div class="container">
+
+    <div class="formulario">
+
+        <h2>➕ Nova notícia</h2>
+        <p>Preencha os dados para publicar uma matéria.</p>
+
+        <form method="POST">
+
+            <label>Categoria</label>
+
+            <select name="categoria" required>
+                <option value="">Selecione</option>
+                <option value="Piauí">Piauí</option>
+                <option value="Política">Política</option>
+                <option value="Brasil">Brasil</option>
+                <option value="Economia">Economia</option>
+                <option value="Cidades">Cidades</option>
+                <option value="Esportes">Esportes</option>
+            </select>
+
+            <label>Título da notícia</label>
+
+            <input
+                type="text"
+                name="titulo"
+                placeholder="Digite o título"
+                required
+            >
+
+            <label>Resumo</label>
+
+            <textarea
+                name="resumo"
+                placeholder="Digite um pequeno resumo"
+                required
+            ></textarea>
+
+            <label>Conteúdo da matéria</label>
+
+            <textarea
+                name="conteudo"
+                placeholder="Escreva a notícia completa"
+                required
+            ></textarea>
+
+            <button type="submit">
+                PUBLICAR NOTÍCIA
+            </button>
+
+        </form>
+
+        <a class="voltar" href="/admin/painel">
+            ← Voltar ao painel
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
