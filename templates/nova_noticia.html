@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Nova Notícia - Diário da Notícia</title>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             background: #f4f4f4;
             color: #222;
         }
@@ -30,7 +36,7 @@
         }
 
         header p {
-            margin-bottom: 0;
+            margin: 8px 0 0;
         }
 
         .container {
@@ -43,11 +49,17 @@
             background: white;
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 3px 15px #ccc;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.15);
         }
 
         h2 {
             margin-top: 0;
+            font-size: 28px;
+        }
+
+        .descricao {
+            color: #555;
+            line-height: 1.5;
         }
 
         label {
@@ -64,102 +76,268 @@
             padding: 13px;
             border: 1px solid #ccc;
             border-radius: 7px;
+            font-family: Arial, Helvetica, sans-serif;
             font-size: 16px;
+            background: white;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: 2px solid #c90000;
+            border-color: #c90000;
         }
 
         textarea {
-            min-height: 180px;
+            min-height: 150px;
             resize: vertical;
+        }
+
+        .conteudo {
+            min-height: 250px;
+        }
+
+        .ajuda {
+            display: block;
+            margin-top: 6px;
+            color: #777;
+            font-size: 13px;
         }
 
         button {
             width: 100%;
             margin-top: 25px;
             padding: 15px;
+
             border: none;
             border-radius: 7px;
+
             background: #c90000;
             color: white;
+
             font-size: 17px;
             font-weight: bold;
+
             cursor: pointer;
+        }
+
+        button:hover {
+            background: #a90000;
         }
 
         .voltar {
             display: block;
             margin-top: 20px;
             text-align: center;
+
             color: #555;
+            text-decoration: none;
+            font-weight: bold;
         }
+
+        .voltar:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+
+            header {
+                padding: 20px;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            .container {
+                margin: 15px auto;
+                padding: 15px;
+            }
+
+            .formulario {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 25px;
+            }
+
+        }
+
     </style>
+
 </head>
+
 
 <body>
 
+
 <header>
+
     <h1>DIÁRIO DA NOTÍCIA</h1>
+
     <p>Painel Administrativo</p>
+
 </header>
+
 
 <div class="container">
 
+
     <div class="formulario">
 
+
         <h2>➕ Nova notícia</h2>
-        <p>Preencha os dados para publicar uma matéria.</p>
+
+        <p class="descricao">
+            Preencha os dados abaixo para publicar uma nova matéria.
+        </p>
+
 
         <form method="POST">
 
-            <label>Categoria</label>
 
-            <select name="categoria" required>
-                <option value="">Selecione</option>
-                <option value="Piauí">Piauí</option>
-                <option value="Política">Política</option>
-                <option value="Brasil">Brasil</option>
-                <option value="Economia">Economia</option>
-                <option value="Cidades">Cidades</option>
-                <option value="Esportes">Esportes</option>
-            </select>
+            <!-- CATEGORIA -->
 
-            <label>Título da notícia</label>
+            <label for="categoria">
+                Categoria
+            </label>
 
-            <input
-                type="text"
-                name="titulo"
-                placeholder="Digite o título"
+            <select
+                id="categoria"
+                name="categoria"
                 required
             >
 
-            <label>Resumo</label>
+                <option value="">
+                    Selecione
+                </option>
+
+                <option value="Piauí">
+                    Piauí
+                </option>
+
+                <option value="Política">
+                    Política
+                </option>
+
+                <option value="Brasil">
+                    Brasil
+                </option>
+
+                <option value="Economia">
+                    Economia
+                </option>
+
+                <option value="Cidades">
+                    Cidades
+                </option>
+
+                <option value="Esportes">
+                    Esportes
+                </option>
+
+                <option value="Educação">
+                    Educação
+                </option>
+
+                <option value="Saúde">
+                    Saúde
+                </option>
+
+                <option value="Polícia">
+                    Polícia
+                </option>
+
+            </select>
+
+
+            <!-- TÍTULO -->
+
+            <label for="titulo">
+                Título da notícia
+            </label>
+
+            <input
+                id="titulo"
+                type="text"
+                name="titulo"
+                placeholder="Digite o título da notícia"
+                required
+            >
+
+
+            <!-- RESUMO -->
+
+            <label for="resumo">
+                Resumo
+            </label>
 
             <textarea
+                id="resumo"
                 name="resumo"
-                placeholder="Digite um pequeno resumo"
+                placeholder="Digite um pequeno resumo da notícia"
                 required
             ></textarea>
 
-            <label>Conteúdo da matéria</label>
+
+            <!-- CONTEÚDO -->
+
+            <label for="conteudo">
+                Conteúdo da matéria
+            </label>
 
             <textarea
+                id="conteudo"
+                class="conteudo"
                 name="conteudo"
-                placeholder="Escreva a notícia completa"
+                placeholder="Escreva aqui a notícia completa"
                 required
             ></textarea>
+
+
+            <!-- IMAGEM -->
+
+            <label for="imagem">
+                📷 Foto da notícia
+            </label>
+
+            <input
+                id="imagem"
+                type="url"
+                name="imagem"
+                placeholder="https://exemplo.com/foto.jpg"
+            >
+
+            <span class="ajuda">
+                Cole aqui o endereço da imagem que será exibida na notícia.
+            </span>
+
+
+            <!-- PUBLICAR -->
 
             <button type="submit">
                 PUBLICAR NOTÍCIA
             </button>
 
+
         </form>
 
-        <a class="voltar" href="/admin/painel">
+
+        <a
+            class="voltar"
+            href="/admin/painel"
+        >
             ← Voltar ao painel
         </a>
 
+
     </div>
+
 
 </div>
 
+
 </body>
+
 </html>
