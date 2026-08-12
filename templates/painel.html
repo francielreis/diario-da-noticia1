@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo | Diário da Notícia</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f5f7;
+            color: #222;
+        }
+
+        header {
+            background: #b90000;
+            color: white;
+            padding: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 23px;
+        }
+
+        header p {
+            margin: 6px 0 0;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 25px 18px;
+        }
+
+        .titulo {
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            display: block;
+            background: white;
+            padding: 25px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #222;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .card span {
+            font-size: 35px;
+        }
+
+        .card h3 {
+            margin: 12px 0 6px;
+        }
+
+        .card p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .sair {
+            margin-top: 30px;
+            display: inline-block;
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+
+        .portal {
+            color: white;
+            display: inline-block;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>DIÁRIO DA NOTÍCIA</h1>
+    <p>Painel Administrativo</p>
+
+    <a class="portal" href="/">
+        Ver portal →
+    </a>
+</header>
+
+<div class="container">
+
+    <div class="titulo">
+        <h2>Bem-vindo ao painel</h2>
+        <p>Gerencie o conteúdo do seu portal.</p>
+    </div>
+
+    <div class="grid">
+
+        <a class="card" href="#">
+            <span>➕</span>
+            <h3>Nova notícia</h3>
+            <p>Publique uma nova matéria no portal.</p>
+        </a>
+
+        <a class="card" href="#">
+            <span>📰</span>
+            <h3>Gerenciar notícias</h3>
+            <p>Edite ou exclua notícias publicadas.</p>
+        </a>
+
+        <a class="card" href="#">
+            <span>📢</span>
+            <h3>Patrocinadores</h3>
+            <p>Cadastre banners e anúncios.</p>
+        </a>
+
+        <a class="card" href="#">
+            <span>🖼️</span>
+            <h3>Imagens</h3>
+            <p>Gerencie fotos utilizadas no portal.</p>
+        </a>
+
+    </div>
+
+    <a class="sair" href="/admin/sair">
+        🚪 Sair do painel
+    </a>
+
+</div>
+
+</body>
+</html>
