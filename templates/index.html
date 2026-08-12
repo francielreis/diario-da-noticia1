@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Diário da Notícia | Notícias do Piauí e do Brasil</title>
+
+    <meta name="description"
+          content="Diário da Notícia - informação, política, notícias locais, Piauí, Brasil e muito mais.">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+        }
+
+        .topo {
+            max-width: 1200px;
+            margin: auto;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #ef4444;
+        }
+
+        nav {
+            background: #dc2626;
+        }
+
+        nav ul {
+            max-width: 1200px;
+            margin: auto;
+            padding: 12px 20px;
+            display: flex;
+            gap: 25px;
+            list-style: none;
+            overflow-x: auto;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 25px auto;
+            padding: 0 20px;
+        }
+
+        .destaque {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,.08);
+            margin-bottom: 30px;
+        }
+
+        .destaque img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            background: #ddd;
+        }
+
+        .destaque-conteudo {
+            padding: 25px;
+        }
+
+        .categoria {
+            color: #dc2626;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin: 10px 0;
+        }
+
+        .noticias-titulo {
+            font-size: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #dc2626;
+            padding-left: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,.08);
+            transition: transform .2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card img {
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+            background: #ddd;
+        }
+
+        .card-conteudo {
+            padding: 18px;
+        }
+
+        .card h2 {
+            font-size: 20px;
+            margin: 8px 0;
+            line-height: 1.3;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .data {
+            font-size: 13px;
+            color: #888;
+            margin-top: 12px;
+        }
+
+        footer {
+            margin-top: 50px;
+            background: #111827;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        footer p {
+            margin: 8px;
+        }
+
+        @media (max-width: 800px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .topo {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .destaque img {
+                height: 230px;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="topo">
+        <div class="logo">
+            DIÁRIO DA <span>NOTÍCIA</span>
+        </div>
+
+        <div>
+            📰 Informação em primeiro lugar
+        </div>
+    </div>
+
+    <nav>
+        <ul>
+            <li><a href="/">Início</a></li>
+            <li><a href="#">Piauí</a></li>
+            <li><a href="#">Política</a></li>
+            <li><a href="#">Brasil</a></li>
+            <li><a href="#">Economia</a></li>
+            <li><a href="#">Esportes</a></li>
+            <li><a href="#">Educação</a></li>
+        </ul>
+    </nav>
+
+</header>
+
+<main class="container">
+
+    <section class="destaque">
+
+        <img
+            src="https://images.unsplash.com/photo-1504711434969-e33886168f5c"
+            alt="Notícias">
+
+        <div class="destaque-conteudo">
+
+            <div class="categoria">Destaque</div>
+
+            <h1>
+                Diário da Notícia: informação, credibilidade e notícias em tempo real
+            </h1>
+
+            <p>
+                Acompanhe as principais notícias do Piauí, do Brasil e do mundo.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <h2 class="noticias-titulo">
+        Últimas Notícias
+    </h2>
+
+
+    <section class="grid">
+
+        <article class="card">
+
+            <img
+                src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620"
+                alt="Política">
+
+            <div class="card-conteudo">
+
+                <div class="categoria">Política</div>
+
+                <h2>
+                    Principais notícias da política do Piauí
+                </h2>
+
+                <p>
+                    Confira as principais informações e acontecimentos da política piauiense.
+                </p>
+
+                <div class="data">
+                    Diário da Notícia
+                </div>
+
+            </div>
+
+        </article>
+
+
+        <article class="card">
+
+            <img
+                src="https://images.unsplash.com/photo-1495020689067-958852a7765e"
+                alt="Notícias">
+
+            <div class="card-conteudo">
+
+                <div class="categoria">Piauí</div>
+
+                <h2>
+                    Notícias das cidades piauienses
+                </h2>
+
+                <p>
+                    Informação sobre os acontecimentos que movimentam as cidades do Piauí.
+                </p>
+
+                <div class="data">
+                    Diário da Notícia
+                </div>
+
+            </div>
+
+        </article>
+
+
+        <article class="card">
+
+            <img
+                src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2"
+                alt="Esportes">
+
+            <div class="card-conteudo">
+
+                <div class="categoria">Esportes</div>
+
+                <h2>
+                    Notícias e resultados do mundo dos esportes
+                </h2>
+
+                <p>
+                    Acompanhe as principais notícias esportivas.
+                </p>
+
+                <div class="data">
+                    Diário da Notícia
+                </div>
+
+            </div>
+
+        </article>
+
+
+        <article class="card">
+
+            <img
+                src="https://images.unsplash.com/photo-1503676260728-
