@@ -13,25 +13,29 @@ noticias = [
         "categoria": "Piauí",
         "titulo": "Confira as principais notícias do Piauí",
         "resumo": "Acompanhe as principais informações do estado.",
-        "conteudo": ""
+        "conteudo": "",
+        "imagem": ""
     },
     {
         "categoria": "Política",
         "titulo": "Principais notícias da política",
         "resumo": "Veja os assuntos que estão movimentando a política.",
-        "conteudo": ""
+        "conteudo": "",
+        "imagem": ""
     },
     {
         "categoria": "Cidades",
         "titulo": "Notícias e acontecimentos das cidades",
         "resumo": "Informação local e prestação de serviços.",
-        "conteudo": ""
+        "conteudo": "",
+        "imagem": ""
     },
     {
         "categoria": "Esportes",
         "titulo": "Tudo sobre esportes",
         "resumo": "Confira as principais notícias esportivas.",
-        "conteudo": ""
+        "conteudo": "",
+        "imagem": ""
     }
 ]
 
@@ -83,12 +87,14 @@ def nova_noticia():
         titulo = request.form.get("titulo")
         resumo = request.form.get("resumo")
         conteudo = request.form.get("conteudo")
+        imagem = request.form.get("imagem")
 
         nova = {
             "categoria": categoria,
             "titulo": titulo,
             "resumo": resumo,
-            "conteudo": conteudo
+            "conteudo": conteudo,
+            "imagem": imagem
         }
 
         noticias.insert(0, nova)
