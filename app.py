@@ -7,7 +7,10 @@ import uuid
 
 app = Flask(__name__)
 
-app.secret_key = os.environ.get("SECRET_KEY", "troque-esta-chave-depois")
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "troque-esta-chave-depois"
+)
 
 
 # ============================================================
@@ -23,7 +26,10 @@ if database_url and database_url.startswith("postgres://"):
         1
     )
 
-app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///diario.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    database_url or "sqlite:///diario.db"
+)
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -33,10 +39,21 @@ db = SQLAlchemy(app)
 # UPLOAD DE IMAGENS
 # ============================================================
 
-UPLOAD_FOLDER = "static/uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+UPLOAD_FOLDER = os.path.join(
+    app.root_path,
+    "static",
+    "uploads"
+)
+
+os.makedirs(
+    UPLOAD_FOLDER,
+    exist_ok=True
+)
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+# tamanho máximo: 10 MB
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
 
 EXTENSOES_PERMITIDAS = {
     "png",
@@ -47,6 +64,7 @@ EXTENSOES_PERMITIDAS = {
 
 
 def arquivo_permitido(nome_arquivo):
+
     return (
         "." in nome_arquivo
         and nome_arquivo.rsplit(".", 1)[1].lower()
@@ -56,17 +74,28 @@ def arquivo_permitido(nome_arquivo):
 
 def salvar_imagem(arquivo):
 
-    if not arquivo or not arquivo.filename:
+    if not arquivo:
+        return ""
+
+    if not arquivo.filename:
         return ""
 
     if not arquivo_permitido(arquivo.filename):
         return None
 
-    nome_seguro = secure_filename(arquivo.filename)
+    nome_seguro = secure_filename(
+        arquivo.filename
+    )
 
-    extensao = nome_seguro.rsplit(".", 1)[1].lower()
+    extensao = (
+        nome_seguro
+        .rsplit(".", 1)[1]
+        .lower()
+    )
 
-    nome_novo = f"{uuid.uuid4().hex}.{extensao}"
+    nome_novo = (
+        f"{uuid.uuid4().hex}.{extensao}"
+    )
 
     caminho = os.path.join(
         app.config["UPLOAD_FOLDER"],
@@ -79,6 +108,33 @@ def salvar_imagem(arquivo):
         "static",
         filename=f"uploads/{nome_novo}"
     )
+
+
+def apagar_imagem(caminho_imagem):
+
+    if not caminho_imagem:
+        return
+
+    if not caminho_imagem.startswith(
+        "/static/uploads/"
+    ):
+        return
+
+    nome = os.path.basename(
+        caminho_imagem
+    )
+
+    caminho = os.path.join(
+        app.config["UPLOAD_FOLDER"],
+        nome
+    )
+
+    if os.path.exists(caminho):
+
+        try:
+            os.remove(caminho)
+        except OSError:
+            pass
 
 
 # ============================================================
@@ -164,6 +220,7 @@ class Patrocinador(db.Model):
 # ============================================================
 
 with app.app_context():
+
     db.create_all()
 
 
@@ -176,14 +233,18 @@ def inicio():
 
     noticias = (
         Noticia.query
-        .order_by(Noticia.data_publicacao.desc())
+        .order_by(
+            Noticia.data_publicacao.desc()
+        )
         .all()
     )
 
     patrocinadores = (
         Patrocinador.query
         .filter_by(ativo=True)
-        .order_by(Patrocinador.id.desc())
+        .order_by(
+            Patrocinador.id.desc()
+        )
         .all()
     )
 
@@ -201,7 +262,10 @@ def inicio():
 @app.route("/noticia/<int:id>")
 def noticia(id):
 
-    noticia = Noticia.query.get_or_404(id)
+    noticia = (
+        Noticia.query
+        .get_or_404(id)
+    )
 
     return render_template(
         "noticia.html",
@@ -210,7 +274,7 @@ def noticia(id):
 
 
 # ============================================================
-# LOGIN
+# LOGIN ADMIN
 # ============================================================
 
 @app.route(
@@ -223,8 +287,15 @@ def admin():
 
     if request.method == "POST":
 
-        usuario = request.form.get("usuario")
-        senha = request.form.get("senha")
+        usuario = request.form.get(
+            "usuario",
+            ""
+        )
+
+        senha = request.form.get(
+            "senha",
+            ""
+        )
 
         admin_usuario = os.environ.get(
             "ADMIN_USER",
@@ -247,7 +318,9 @@ def admin():
                 url_for("painel")
             )
 
-        erro = "Usuário ou senha incorretos."
+        erro = (
+            "Usuário ou senha incorretos."
+        )
 
     return render_template(
         "login.html",
@@ -256,26 +329,31 @@ def admin():
 
 
 # ============================================================
-# PAINEL
+# PAINEL ADMIN
 # ============================================================
 
 @app.route("/admin/painel")
 def painel():
 
     if not session.get("admin"):
+
         return redirect(
             url_for("admin")
         )
 
     noticias = (
         Noticia.query
-        .order_by(Noticia.data_publicacao.desc())
+        .order_by(
+            Noticia.data_publicacao.desc()
+        )
         .all()
     )
 
     patrocinadores = (
         Patrocinador.query
-        .order_by(Patrocinador.id.desc())
+        .order_by(
+            Patrocinador.id.desc()
+        )
         .all()
     )
 
@@ -297,6 +375,7 @@ def painel():
 def nova_noticia():
 
     if not session.get("admin"):
+
         return redirect(
             url_for("admin")
         )
@@ -305,27 +384,48 @@ def nova_noticia():
 
     if request.method == "POST":
 
-        categoria = request.form.get(
-            "categoria"
+        categoria = (
+            request.form
+            .get("categoria", "")
+            .strip()
         )
 
-        titulo = request.form.get(
-            "titulo"
+        titulo = (
+            request.form
+            .get("titulo", "")
+            .strip()
         )
 
-        resumo = request.form.get(
-            "resumo"
+        resumo = (
+            request.form
+            .get("resumo", "")
+            .strip()
         )
 
-        conteudo = request.form.get(
-            "conteudo"
+        conteudo = (
+            request.form
+            .get("conteudo", "")
+            .strip()
         )
+
+        if not categoria or not titulo:
+
+            erro = (
+                "Informe a categoria e o título."
+            )
+
+            return render_template(
+                "nova_noticia.html",
+                erro=erro
+            )
 
         arquivo = request.files.get(
             "imagem"
         )
 
-        imagem = salvar_imagem(arquivo)
+        imagem = salvar_imagem(
+            arquivo
+        )
 
         if imagem is None:
 
@@ -347,11 +447,17 @@ def nova_noticia():
             imagem=imagem
         )
 
-        db.session.add(nova)
+        db.session.add(
+            nova
+        )
+
         db.session.commit()
 
         return redirect(
-            url_for("inicio")
+            url_for(
+                "noticia",
+                id=nova.id
+            )
         )
 
     return render_template(
@@ -371,13 +477,24 @@ def nova_noticia():
 def excluir_noticia(id):
 
     if not session.get("admin"):
+
         return redirect(
             url_for("admin")
         )
 
-    noticia = Noticia.query.get_or_404(id)
+    noticia = (
+        Noticia.query
+        .get_or_404(id)
+    )
 
-    db.session.delete(noticia)
+    apagar_imagem(
+        noticia.imagem
+    )
+
+    db.session.delete(
+        noticia
+    )
+
     db.session.commit()
 
     return redirect(
@@ -386,7 +503,7 @@ def excluir_noticia(id):
 
 
 # ============================================================
-# CADASTRAR PATROCINADOR
+# NOVO PATROCINADOR
 # ============================================================
 
 @app.route(
@@ -396,6 +513,7 @@ def excluir_noticia(id):
 def novo_patrocinador():
 
     if not session.get("admin"):
+
         return redirect(
             url_for("admin")
         )
@@ -404,24 +522,42 @@ def novo_patrocinador():
 
     if request.method == "POST":
 
-        nome = request.form.get(
-            "nome"
+        nome = (
+            request.form
+            .get("nome", "")
+            .strip()
         )
 
-        link = request.form.get(
-            "link"
+        link = (
+            request.form
+            .get("link", "")
+            .strip()
         )
+
+        if not nome:
+
+            erro = (
+                "Informe o nome do patrocinador."
+            )
+
+            return render_template(
+                "novo_patrocinador.html",
+                erro=erro
+            )
 
         arquivo = request.files.get(
             "imagem"
         )
 
-        imagem = salvar_imagem(arquivo)
+        imagem = salvar_imagem(
+            arquivo
+        )
 
         if imagem is None:
 
             erro = (
-                "Formato de imagem não permitido."
+                "Formato de imagem não permitido. "
+                "Use JPG, JPEG, PNG ou WEBP."
             )
 
             return render_template(
@@ -436,7 +572,10 @@ def novo_patrocinador():
             ativo=True
         )
 
-        db.session.add(patrocinador)
+        db.session.add(
+            patrocinador
+        )
+
         db.session.commit()
 
         return redirect(
@@ -460,15 +599,24 @@ def novo_patrocinador():
 def excluir_patrocinador(id):
 
     if not session.get("admin"):
+
         return redirect(
             url_for("admin")
         )
 
     patrocinador = (
-        Patrocinador.query.get_or_404(id)
+        Patrocinador.query
+        .get_or_404(id)
     )
 
-    db.session.delete(patrocinador)
+    apagar_imagem(
+        patrocinador.imagem
+    )
+
+    db.session.delete(
+        patrocinador
+    )
+
     db.session.commit()
 
     return redirect(
@@ -490,6 +638,20 @@ def sair():
 
     return redirect(
         url_for("admin")
+    )
+
+
+# ============================================================
+# ERRO DE IMAGEM GRANDE
+# ============================================================
+
+@app.errorhandler(413)
+def arquivo_grande(error):
+
+    return (
+        "A imagem é muito grande. "
+        "Envie uma imagem com até 10 MB.",
+        413
     )
 
 
