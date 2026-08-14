@@ -52,7 +52,7 @@ os.makedirs(
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-# tamanho máximo: 10 MB
+# Máximo de 10 MB
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
 
 EXTENSOES_PERMITIDAS = {
@@ -220,7 +220,6 @@ class Patrocinador(db.Model):
 # ============================================================
 
 with app.app_context():
-
     db.create_all()
 
 
@@ -262,10 +261,7 @@ def inicio():
 @app.route("/noticia/<int:id>")
 def noticia(id):
 
-    noticia = (
-        Noticia.query
-        .get_or_404(id)
-    )
+    noticia = Noticia.query.get_or_404(id)
 
     return render_template(
         "noticia.html",
@@ -318,9 +314,7 @@ def admin():
                 url_for("painel")
             )
 
-        erro = (
-            "Usuário ou senha incorretos."
-        )
+        erro = "Usuário ou senha incorretos."
 
     return render_template(
         "login.html",
@@ -467,6 +461,118 @@ def nova_noticia():
 
 
 # ============================================================
+# EDITAR NOTÍCIA
+# ============================================================
+
+@app.route(
+    "/admin/editar-noticia/<int:id>",
+    methods=["GET", "POST"]
+)
+def editar_noticia(id):
+
+    if not session.get("admin"):
+
+        return redirect(
+            url_for("admin")
+        )
+
+    noticia = Noticia.query.get_or_404(id)
+
+    erro = None
+
+    if request.method == "POST":
+
+        categoria = (
+            request.form
+            .get("categoria", "")
+            .strip()
+        )
+
+        titulo = (
+            request.form
+            .get("titulo", "")
+            .strip()
+        )
+
+        resumo = (
+            request.form
+            .get("resumo", "")
+            .strip()
+        )
+
+        conteudo = (
+            request.form
+            .get("conteudo", "")
+            .strip()
+        )
+
+        if not categoria or not titulo:
+
+            erro = (
+                "Informe a categoria e o título."
+            )
+
+            return render_template(
+                "editar_noticia.html",
+                noticia=noticia,
+                erro=erro
+            )
+
+        # Atualizar os textos
+        noticia.categoria = categoria
+        noticia.titulo = titulo
+        noticia.resumo = resumo
+        noticia.conteudo = conteudo
+
+        # Verificar se uma nova foto foi enviada
+        arquivo = request.files.get(
+            "imagem"
+        )
+
+        if arquivo and arquivo.filename:
+
+            nova_imagem = salvar_imagem(
+                arquivo
+            )
+
+            if nova_imagem is None:
+
+                erro = (
+                    "Formato de imagem não permitido. "
+                    "Use JPG, JPEG, PNG ou WEBP."
+                )
+
+                return render_template(
+                    "editar_noticia.html",
+                    noticia=noticia,
+                    erro=erro
+                )
+
+            # Apaga foto antiga se ela ainda existir
+            apagar_imagem(
+                noticia.imagem
+            )
+
+            # Salva endereço da nova foto
+            noticia.imagem = nova_imagem
+
+        db.session.commit()
+
+        return redirect(
+            url_for(
+                "noticia",
+                id=noticia.id
+            )
+        )
+
+    return render_template(
+        "editar_noticia.html",
+        noticia=noticia,
+        erro=erro
+    )
+
+
+# ============================================================
 # EXCLUIR NOTÍCIA
 # ============================================================
 
@@ -482,10 +588,7 @@ def excluir_noticia(id):
             url_for("admin")
         )
 
-    noticia = (
-        Noticia.query
-        .get_or_404(id)
-    )
+    noticia = Noticia.query.get_or_404(id)
 
     apagar_imagem(
         noticia.imagem
