@@ -1,7 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,7 +11,9 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Diário da Notícia | Notícias do Piauí e do Brasil</title>
+    <title>
+        Diário da Notícia | Notícias do Piauí e do Brasil
+    </title>
 
     <meta
         name="description"
@@ -24,119 +28,197 @@
             box-sizing: border-box;
         }
 
+
         body {
             font-family: Arial, Helvetica, sans-serif;
             background: #f4f4f4;
             color: #222;
         }
 
-        /* CABEÇALHO */
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+
+        /* =========================================
+           CABEÇALHO
+        ========================================= */
+
 
         header {
             background: #111827;
             color: white;
         }
 
+
         .topo {
             max-width: 1200px;
             margin: auto;
+
             padding: 18px 20px;
 
             display: flex;
             justify-content: space-between;
             align-items: center;
+
             gap: 20px;
         }
+
 
         .logo {
             font-size: 28px;
             font-weight: bold;
         }
 
+
         .logo span {
             color: #ef4444;
         }
 
 
-        /* MENU */
+        /* =========================================
+           MENU
+        ========================================= */
+
 
         nav {
             background: #dc2626;
         }
 
+
         nav ul {
             max-width: 1200px;
             margin: auto;
+
             padding: 12px 20px;
 
             display: flex;
             gap: 25px;
 
             list-style: none;
+
             overflow-x: auto;
         }
 
+
         nav a {
             color: white;
-            text-decoration: none;
+
             font-weight: bold;
+
             white-space: nowrap;
         }
 
 
-        /* CONTEÚDO */
+        nav a:hover {
+            opacity: .8;
+        }
+
+
+        /* =========================================
+           CONTAINER
+        ========================================= */
+
 
         .container {
             max-width: 1200px;
+
             margin: 25px auto;
+
             padding: 0 20px;
         }
 
 
-        /* DESTAQUE */
+        /* =========================================
+           DESTAQUE PRINCIPAL
+        ========================================= */
+
 
         .destaque {
             background: white;
 
-            border-radius: 10px;
+            border-radius: 12px;
+
             overflow: hidden;
 
-            box-shadow: 0 2px 10px rgba(0,0,0,.08);
+            box-shadow:
+                0 3px 15px rgba(0,0,0,.10);
 
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
+
 
         .destaque img {
             width: 100%;
-            height: 350px;
+            height: 420px;
+
             object-fit: cover;
+
             display: block;
         }
+
 
         .destaque-conteudo {
             padding: 25px;
         }
 
+
         .categoria {
             color: #dc2626;
 
             font-weight: bold;
+
             text-transform: uppercase;
 
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        h1 {
-            font-size: 32px;
+
+        .destaque h1 {
+            font-size: 34px;
+
+            line-height: 1.2;
+
             margin: 10px 0;
         }
 
 
-        /* ÚLTIMAS NOTÍCIAS */
+        .destaque p {
+            color: #555;
 
-        .noticias-titulo {
+            line-height: 1.6;
+
+            font-size: 17px;
+        }
+
+
+        .leia-mais {
+            display: inline-block;
+
+            margin-top: 15px;
+
+            background: #dc2626;
+            color: white;
+
+            padding: 10px 18px;
+
+            border-radius: 6px;
+
+            font-weight: bold;
+        }
+
+
+        /* =========================================
+           TÍTULOS
+        ========================================= */
+
+
+        .secao-titulo {
             font-size: 25px;
 
+            margin-top: 35px;
             margin-bottom: 20px;
 
             border-left: 5px solid #dc2626;
@@ -145,7 +227,10 @@
         }
 
 
-        /* GRID */
+        /* =========================================
+           GRID DAS NOTÍCIAS
+        ========================================= */
+
 
         .grid {
             display: grid;
@@ -153,11 +238,14 @@
             grid-template-columns:
                 repeat(3, 1fr);
 
-            gap: 20px;
+            gap: 22px;
         }
 
 
-        /* CARD DA NOTÍCIA */
+        /* =========================================
+           CARD
+        ========================================= */
+
 
         .card {
             background: white;
@@ -167,8 +255,21 @@
             overflow: hidden;
 
             box-shadow:
-                0 2px 8px rgba(0,0,0,.08);
+                0 2px 10px rgba(0,0,0,.08);
+
+            transition:
+                transform .2s,
+                box-shadow .2s;
         }
+
+
+        .card:hover {
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 6px 18px rgba(0,0,0,.13);
+        }
+
 
         .card img {
             width: 100%;
@@ -179,9 +280,11 @@
             display: block;
         }
 
+
         .card-conteudo {
             padding: 18px;
         }
+
 
         .card h2 {
             font-size: 20px;
@@ -191,21 +294,13 @@
             line-height: 1.3;
         }
 
+
         .card p {
             color: #666;
 
             line-height: 1.5;
         }
 
-        .conteudo {
-            margin-top: 12px;
-
-            line-height: 1.6;
-
-            color: #444;
-
-            white-space: pre-line;
-        }
 
         .data {
             font-size: 13px;
@@ -216,10 +311,109 @@
         }
 
 
-        /* RODAPÉ */
+        /* =========================================
+           PATROCINADORES
+        ========================================= */
+
+
+        .patrocinadores {
+            margin-top: 45px;
+        }
+
+
+        .patrocinadores-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 20px;
+        }
+
+
+        .patrocinador {
+            background: white;
+
+            border-radius: 10px;
+
+            overflow: hidden;
+
+            border: 1px solid #e5e7eb;
+
+            box-shadow:
+                0 2px 8px rgba(0,0,0,.06);
+
+            text-align: center;
+
+            transition: transform .2s;
+        }
+
+
+        .patrocinador:hover {
+            transform: translateY(-3px);
+        }
+
+
+        .patrocinador img {
+            width: 100%;
+
+            height: 160px;
+
+            object-fit: contain;
+
+            background: white;
+
+            padding: 10px;
+        }
+
+
+        .patrocinador-nome {
+            padding: 12px;
+
+            font-weight: bold;
+
+            color: #333;
+        }
+
+
+        .publicidade {
+            font-size: 11px;
+
+            color: #999;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+
+            margin-bottom: 5px;
+        }
+
+
+        /* =========================================
+           SEM NOTÍCIAS
+        ========================================= */
+
+
+        .sem-conteudo {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 10px;
+
+            text-align: center;
+
+            color: #666;
+        }
+
+
+        /* =========================================
+           RODAPÉ
+        ========================================= */
+
 
         footer {
-            margin-top: 50px;
+            margin-top: 60px;
 
             background: #111827;
 
@@ -227,52 +421,93 @@
 
             text-align: center;
 
-            padding: 30px 20px;
+            padding: 35px 20px;
         }
+
 
         footer p {
-            margin: 5px 0;
+            margin: 6px 0;
         }
 
 
-        /* TABLET */
+        /* =========================================
+           TABLET
+        ========================================= */
 
-        @media (max-width: 800px) {
+
+        @media (max-width: 900px) {
 
             .grid {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+
+            .patrocinadores-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
             }
 
         }
 
 
-        /* CELULAR */
+        /* =========================================
+           CELULAR
+        ========================================= */
+
 
         @media (max-width: 550px) {
 
             .topo {
                 flex-direction: column;
+
                 text-align: center;
             }
+
+
+            .logo {
+                font-size: 25px;
+            }
+
 
             .grid {
                 grid-template-columns: 1fr;
             }
 
-            .destaque img {
-                height: 230px;
+
+            .patrocinadores-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
             }
 
-            h1 {
-                font-size: 23px;
+
+            .destaque img {
+                height: 240px;
             }
+
+
+            .destaque h1 {
+                font-size: 24px;
+            }
+
+
+            .destaque p {
+                font-size: 16px;
+            }
+
 
             .card h2 {
-                font-size: 22px;
+                font-size: 21px;
             }
+
 
             .card img {
                 height: 230px;
+            }
+
+
+            .patrocinador img {
+                height: 120px;
             }
 
         }
@@ -285,59 +520,82 @@
 <body>
 
 
-<!-- CABEÇALHO -->
+<!-- =========================================
+     CABEÇALHO
+========================================= -->
+
 
 <header>
 
     <div class="topo">
 
         <div class="logo">
-            DIÁRIO DA <span>NOTÍCIA</span>
+
+            DIÁRIO DA
+            <span>NOTÍCIA</span>
+
         </div>
 
+
         <div>
+
             📰 Informação em primeiro lugar
+
         </div>
 
     </div>
 
-
-    <!-- MENU -->
 
     <nav>
 
         <ul>
 
             <li>
-                <a href="/">Início</a>
+                <a href="/">
+                    Início
+                </a>
             </li>
 
             <li>
-                <a href="#">Piauí</a>
+                <a href="#">
+                    Piauí
+                </a>
             </li>
 
             <li>
-                <a href="#">Política</a>
+                <a href="#">
+                    Política
+                </a>
             </li>
 
             <li>
-                <a href="#">Brasil</a>
+                <a href="#">
+                    Brasil
+                </a>
             </li>
 
             <li>
-                <a href="#">Economia</a>
+                <a href="#">
+                    Economia
+                </a>
             </li>
 
             <li>
-                <a href="#">Cidades</a>
+                <a href="#">
+                    Cidades
+                </a>
             </li>
 
             <li>
-                <a href="#">Esportes</a>
+                <a href="#">
+                    Esportes
+                </a>
             </li>
 
             <li>
-                <a href="#">Educação</a>
+                <a href="#">
+                    Educação
+                </a>
             </li>
 
         </ul>
@@ -348,167 +606,355 @@
 
 
 
-<!-- CONTEÚDO -->
+<!-- =========================================
+     CONTEÚDO
+========================================= -->
+
 
 <main class="container">
 
 
-    <!-- DESTAQUE PRINCIPAL -->
-
-    <section class="destaque">
-
-        <img
-            src="https://images.unsplash.com/photo-1504711434969-e33886168f5c"
-            alt="Diário da Notícia"
-        >
-
-        <div class="destaque-conteudo">
-
-            <div class="categoria">
-                Destaque
-            </div>
-
-            <h1>
-                Diário da Notícia: informação,
-                credibilidade e notícias em tempo real
-            </h1>
-
-            <p>
-                Acompanhe as principais notícias do
-                Piauí, do Brasil e do mundo.
-            </p>
-
-        </div>
-
-    </section>
+    <!-- =====================================
+         DESTAQUE AUTOMÁTICO
+    ====================================== -->
 
 
-
-    <!-- TÍTULO -->
-
-    <h2 class="noticias-titulo">
-        Últimas Notícias
-    </h2>
+    {% if noticias %}
 
 
-
-    <!-- NOTÍCIAS -->
-
-    <section class="grid">
+        {% set destaque = noticias[0] %}
 
 
-        {% for noticia in noticias %}
+        <section class="destaque">
 
 
-        <article class="card">
+            <a
+                href="{{ url_for('noticia', id=destaque.id) }}"
+            >
 
 
-            <!-- IMAGEM CADASTRADA PELO PAINEL -->
+                {% if destaque.imagem %}
 
-            {% if noticia.imagem %}
+                    <img
+                        src="{{ destaque.imagem }}"
+                        alt="{{ destaque.titulo }}"
+                    >
 
-                <img
-                    src="{{ noticia.imagem }}"
-                    alt="{{ noticia.titulo }}"
-                >
+                {% else %}
 
-
-            <!-- IMAGEM PADRÃO ESPORTES -->
-
-            {% elif noticia.categoria == "Esportes" %}
-
-                <img
-                    src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2"
-                    alt="{{ noticia.titulo }}"
-                >
-
-
-            <!-- IMAGEM PADRÃO POLÍTICA -->
-
-            {% elif noticia.categoria == "Política" %}
-
-                <img
-                    src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620"
-                    alt="{{ noticia.titulo }}"
-                >
-
-
-            <!-- IMAGEM PADRÃO BRASIL -->
-
-            {% elif noticia.categoria == "Brasil" %}
-
-                <img
-                    src="https://images.unsplash.com/photo-1495020689067-958852a7765e"
-                    alt="{{ noticia.titulo }}"
-                >
-
-
-            <!-- IMAGEM PADRÃO -->
-
-            {% else %}
-
-                <img
-                    src="https://images.unsplash.com/photo-1504711434969-e33886168f5c"
-                    alt="{{ noticia.titulo }}"
-                >
-
-            {% endif %}
-
-
-
-            <!-- TEXTO DA NOTÍCIA -->
-
-            <div class="card-conteudo">
-
-
-                <div class="categoria">
-
-                    {{ noticia.categoria }}
-
-                </div>
-
-
-                <h2>
-
-                    {{ noticia.titulo }}
-
-                </h2>
-
-
-                <p>
-
-                    {{ noticia.resumo }}
-
-                </p>
-
-
-
-                {% if noticia.conteudo %}
-
-                    <div class="conteudo">
-
-                        {{ noticia.conteudo }}
-
-                    </div>
+                    <img
+                        src="https://images.unsplash.com/photo-1504711434969-e33886168f5c"
+                        alt="{{ destaque.titulo }}"
+                    >
 
                 {% endif %}
 
 
+            </a>
 
-                <div class="data">
 
-                    Diário da Notícia
+            <div class="destaque-conteudo">
+
+
+                <div class="categoria">
+
+                    {{ destaque.categoria }}
 
                 </div>
+
+
+                <h1>
+
+                    {{ destaque.titulo }}
+
+                </h1>
+
+
+                <p>
+
+                    {{ destaque.resumo }}
+
+                </p>
+
+
+                <a
+                    class="leia-mais"
+                    href="{{ url_for('noticia', id=destaque.id) }}"
+                >
+
+                    Ler notícia completa
+
+                </a>
 
 
             </div>
 
 
-        </article>
+        </section>
 
 
-        {% endfor %}
+    {% endif %}
+
+
+
+    <!-- =====================================
+         ÚLTIMAS NOTÍCIAS
+    ====================================== -->
+
+
+    <h2 class="secao-titulo">
+
+        Últimas Notícias
+
+    </h2>
+
+
+    {% if noticias %}
+
+
+        <section class="grid">
+
+
+            {% for noticia in noticias %}
+
+
+                <article class="card">
+
+
+                    <a
+                        href="{{ url_for('noticia', id=noticia.id) }}"
+                    >
+
+
+                        {% if noticia.imagem %}
+
+
+                            <img
+                                src="{{ noticia.imagem }}"
+                                alt="{{ noticia.titulo }}"
+                            >
+
+
+                        {% elif noticia.categoria == "Esportes" %}
+
+
+                            <img
+                                src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2"
+                                alt="{{ noticia.titulo }}"
+                            >
+
+
+                        {% elif noticia.categoria == "Política" %}
+
+
+                            <img
+                                src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620"
+                                alt="{{ noticia.titulo }}"
+                            >
+
+
+                        {% elif noticia.categoria == "Brasil" %}
+
+
+                            <img
+                                src="https://images.unsplash.com/photo-1495020689067-958852a7765e"
+                                alt="{{ noticia.titulo }}"
+                            >
+
+
+                        {% else %}
+
+
+                            <img
+                                src="https://images.unsplash.com/photo-1504711434969-e33886168f5c"
+                                alt="{{ noticia.titulo }}"
+                            >
+
+
+                        {% endif %}
+
+
+                    </a>
+
+
+                    <div class="card-conteudo">
+
+
+                        <div class="categoria">
+
+                            {{ noticia.categoria }}
+
+                        </div>
+
+
+                        <a
+                            href="{{ url_for('noticia', id=noticia.id) }}"
+                        >
+
+
+                            <h2>
+
+                                {{ noticia.titulo }}
+
+                            </h2>
+
+
+                        </a>
+
+
+                        <p>
+
+                            {{ noticia.resumo }}
+
+                        </p>
+
+
+                        <a
+                            class="leia-mais"
+                            href="{{ url_for('noticia', id=noticia.id) }}"
+                        >
+
+                            Leia mais
+
+                        </a>
+
+
+                        <div class="data">
+
+
+                            {% if noticia.data_publicacao %}
+
+                                {{ noticia.data_publicacao.strftime('%d/%m/%Y às %H:%M') }}
+
+                            {% else %}
+
+                                Diário da Notícia
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </article>
+
+
+            {% endfor %}
+
+
+        </section>
+
+
+    {% else %}
+
+
+        <div class="sem-conteudo">
+
+            Nenhuma notícia publicada ainda.
+
+        </div>
+
+
+    {% endif %}
+
+
+
+    <!-- =====================================
+         PATROCINADORES
+    ====================================== -->
+
+
+    <section class="patrocinadores">
+
+
+        <h2 class="secao-titulo">
+
+            Nossos Patrocinadores
+
+        </h2>
+
+
+        <div class="publicidade">
+
+            Publicidade
+
+        </div>
+
+
+        {% if patrocinadores %}
+
+
+            <div class="patrocinadores-grid">
+
+
+                {% for patrocinador in patrocinadores %}
+
+
+                    <div class="patrocinador">
+
+
+                        {% if patrocinador.link %}
+
+
+                            <a
+                                href="{{ patrocinador.link }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+
+
+                        {% endif %}
+
+
+                            {% if patrocinador.imagem %}
+
+
+                                <img
+                                    src="{{ patrocinador.imagem }}"
+                                    alt="{{ patrocinador.nome }}"
+                                >
+
+
+                            {% endif %}
+
+
+                            <div class="patrocinador-nome">
+
+                                {{ patrocinador.nome }}
+
+                            </div>
+
+
+                        {% if patrocinador.link %}
+
+                            </a>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+        {% else %}
+
+
+            <div class="sem-conteudo">
+
+                Espaço disponível para patrocinadores.
+
+            </div>
+
+
+        {% endif %}
 
 
     </section>
@@ -518,23 +964,38 @@
 
 
 
-<!-- RODAPÉ -->
+<!-- =========================================
+     RODAPÉ
+========================================= -->
+
 
 <footer>
 
+
     <p>
+
         <strong>
+
             DIÁRIO DA NOTÍCIA
+
         </strong>
+
     </p>
 
+
     <p>
+
         Informação e credibilidade.
+
     </p>
 
+
     <p>
+
         © 2026 Diário da Notícia
+
     </p>
+
 
 </footer>
 
