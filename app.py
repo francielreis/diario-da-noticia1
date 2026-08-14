@@ -64,17 +64,27 @@ EXTENSOES_PERMITIDAS = {
     "png",
     "jpg",
     "jpeg",
-    "webp"
+    "webp",
+    "heic",
+    "heif"
 }
 
 
 def arquivo_permitido(nome_arquivo):
 
-    return (
-        "." in nome_arquivo
-        and nome_arquivo.rsplit(".", 1)[1].lower()
-        in EXTENSOES_PERMITIDAS
+    if not nome_arquivo:
+        return False
+
+    if "." not in nome_arquivo:
+        return False
+
+    extensao = (
+        nome_arquivo
+        .rsplit(".", 1)[1]
+        .lower()
     )
+
+    return extensao in EXTENSOES_PERMITIDAS
 
 
 # ============================================================
@@ -89,8 +99,42 @@ def salvar_imagem(arquivo):
     if not arquivo.filename:
         return ""
 
-    if not arquivo_permitido(arquivo.filename):
-        return None
+    # Verifica extensão da imagem
+    if not arquivo_permitido(
+        arquivo.filename
+    ):
+        raise ValueError(
+            "Formato de imagem não permitido. "
+            "Use JPG, JPEG, PNG, WEBP, HEIC ou HEIF."
+        )
+
+    # Verifica as configurações do Cloudinary
+    cloud_name = os.environ.get(
+        "CLOUDINARY_CLOUD_NAME"
+    )
+
+    api_key = os.environ.get(
+        "CLOUDINARY_API_KEY"
+    )
+
+    api_secret = os.environ.get(
+        "CLOUDINARY_API_SECRET"
+    )
+
+    if not cloud_name:
+        raise RuntimeError(
+            "CLOUDINARY_CLOUD_NAME não configurado no Render."
+        )
+
+    if not api_key:
+        raise RuntimeError(
+            "CLOUDINARY_API_KEY não configurado no Render."
+        )
+
+    if not api_secret:
+        raise RuntimeError(
+            "CLOUDINARY_API_SECRET não configurado no Render."
+        )
 
     try:
 
@@ -100,54 +144,80 @@ def salvar_imagem(arquivo):
             resource_type="image"
         )
 
-        return resultado.get("secure_url")
+        url = resultado.get(
+            "secure_url"
+        )
+
+        if not url:
+
+            raise RuntimeError(
+                "O Cloudinary não retornou o endereço da imagem."
+            )
+
+        return url
 
     except Exception as erro:
 
         print(
-            "Erro ao enviar imagem para o Cloudinary:",
-            erro
+            "ERRO REAL DO CLOUDINARY:",
+            repr(erro)
         )
 
-        return None
+        raise erro
 
 
 # ============================================================
-# PEGAR PUBLIC ID DA IMAGEM CLOUDINARY
+# PEGAR PUBLIC ID DO CLOUDINARY
 # ============================================================
 
-def obter_public_id(caminho_imagem):
+def obter_public_id(
+    caminho_imagem
+):
 
     if not caminho_imagem:
         return None
 
-    if "res.cloudinary.com" not in caminho_imagem:
+    if (
+        "res.cloudinary.com"
+        not in caminho_imagem
+    ):
         return None
 
     try:
 
-        partes = caminho_imagem.split("/upload/")
+        partes = caminho_imagem.split(
+            "/upload/"
+        )
 
         if len(partes) != 2:
             return None
 
         caminho = partes[1]
 
-        partes_caminho = caminho.split("/")
+        partes_caminho = (
+            caminho.split("/")
+        )
 
-        # Remove versão, exemplo:
+        # Exemplo:
         # v1720000000
         if (
             partes_caminho
-            and partes_caminho[0].startswith("v")
-            and partes_caminho[0][1:].isdigit()
+            and partes_caminho[0]
+            .startswith("v")
+            and partes_caminho[0][1:]
+            .isdigit()
         ):
-            partes_caminho = partes_caminho[1:]
+            partes_caminho = (
+                partes_caminho[1:]
+            )
 
-        caminho = "/".join(partes_caminho)
+        caminho = "/".join(
+            partes_caminho
+        )
 
-        # Remove extensão
-        public_id = os.path.splitext(caminho)[0]
+        public_id = os.path.splitext(
+            caminho
+        )[0]
 
         return public_id
 
@@ -162,17 +232,20 @@ def obter_public_id(caminho_imagem):
 
 
 # ============================================================
-# APAGAR IMAGEM
+# APAGAR IMAGEM DO CLOUDINARY
 # ============================================================
 
-def apagar_imagem(caminho_imagem):
+def apagar_imagem(
+    caminho_imagem
+):
 
     if not caminho_imagem:
         return
 
-    # Imagens antigas do Render.
-    # Não tenta excluir porque podem nem existir mais.
-    if caminho_imagem.startswith("/static/uploads/"):
+    # Imagens antigas armazenadas localmente
+    if caminho_imagem.startswith(
+        "/static/uploads/"
+    ):
         return
 
     public_id = obter_public_id(
@@ -192,7 +265,7 @@ def apagar_imagem(caminho_imagem):
     except Exception as erro:
 
         print(
-            "Erro ao apagar imagem do Cloudinary:",
+            "Erro ao apagar imagem:",
             erro
         )
 
@@ -280,6 +353,7 @@ class Patrocinador(db.Model):
 # ============================================================
 
 with app.app_context():
+
     db.create_all()
 
 
@@ -293,16 +367,22 @@ def inicio():
     noticias = (
         Noticia.query
         .order_by(
-            Noticia.data_publicacao.desc()
+            Noticia
+            .data_publicacao
+            .desc()
         )
         .all()
     )
 
     patrocinadores = (
         Patrocinador.query
-        .filter_by(ativo=True)
+        .filter_by(
+            ativo=True
+        )
         .order_by(
-            Patrocinador.id.desc()
+            Patrocinador
+            .id
+            .desc()
         )
         .all()
     )
@@ -315,13 +395,18 @@ def inicio():
 
 
 # ============================================================
-# PÁGINA DA NOTÍCIA
+# PÁGINA INDIVIDUAL DA NOTÍCIA
 # ============================================================
 
-@app.route("/noticia/<int:id>")
+@app.route(
+    "/noticia/<int:id>"
+)
 def noticia(id):
 
-    noticia = Noticia.query.get_or_404(id)
+    noticia = (
+        Noticia.query
+        .get_or_404(id)
+    )
 
     return render_template(
         "noticia.html",
@@ -343,24 +428,36 @@ def admin():
 
     if request.method == "POST":
 
-        usuario = request.form.get(
-            "usuario",
-            ""
+        usuario = (
+            request.form
+            .get(
+                "usuario",
+                ""
+            )
+            .strip()
         )
 
-        senha = request.form.get(
-            "senha",
-            ""
+        senha = (
+            request.form
+            .get(
+                "senha",
+                ""
+            )
+            .strip()
         )
 
-        admin_usuario = os.environ.get(
-            "ADMIN_USER",
-            "admin"
+        admin_usuario = (
+            os.environ.get(
+                "ADMIN_USER",
+                "admin"
+            )
         )
 
-        admin_senha = os.environ.get(
-            "ADMIN_PASSWORD",
-            "admin123"
+        admin_senha = (
+            os.environ.get(
+                "ADMIN_PASSWORD",
+                "admin123"
+            )
         )
 
         if (
@@ -368,13 +465,19 @@ def admin():
             and senha == admin_senha
         ):
 
-            session["admin"] = True
+            session[
+                "admin"
+            ] = True
 
             return redirect(
-                url_for("painel")
+                url_for(
+                    "painel"
+                )
             )
 
-        erro = "Usuário ou senha incorretos."
+        erro = (
+            "Usuário ou senha incorretos."
+        )
 
     return render_template(
         "login.html",
@@ -383,22 +486,30 @@ def admin():
 
 
 # ============================================================
-# PAINEL ADMIN
+# PAINEL ADMINISTRATIVO
 # ============================================================
 
-@app.route("/admin/painel")
+@app.route(
+    "/admin/painel"
+)
 def painel():
 
-    if not session.get("admin"):
+    if not session.get(
+        "admin"
+    ):
 
         return redirect(
-            url_for("admin")
+            url_for(
+                "admin"
+            )
         )
 
     noticias = (
         Noticia.query
         .order_by(
-            Noticia.data_publicacao.desc()
+            Noticia
+            .data_publicacao
+            .desc()
         )
         .all()
     )
@@ -406,7 +517,9 @@ def painel():
     patrocinadores = (
         Patrocinador.query
         .order_by(
-            Patrocinador.id.desc()
+            Patrocinador
+            .id
+            .desc()
         )
         .all()
     )
@@ -428,10 +541,14 @@ def painel():
 )
 def nova_noticia():
 
-    if not session.get("admin"):
+    if not session.get(
+        "admin"
+    ):
 
         return redirect(
-            url_for("admin")
+            url_for(
+                "admin"
+            )
         )
 
     erro = None
@@ -440,32 +557,45 @@ def nova_noticia():
 
         categoria = (
             request.form
-            .get("categoria", "")
+            .get(
+                "categoria",
+                ""
+            )
             .strip()
         )
 
         titulo = (
             request.form
-            .get("titulo", "")
+            .get(
+                "titulo",
+                ""
+            )
             .strip()
         )
 
         resumo = (
             request.form
-            .get("resumo", "")
+            .get(
+                "resumo",
+                ""
+            )
             .strip()
         )
 
         conteudo = (
             request.form
-            .get("conteudo", "")
+            .get(
+                "conteudo",
+                ""
+            )
             .strip()
         )
 
         if not categoria or not titulo:
 
             erro = (
-                "Informe a categoria e o título."
+                "Informe a categoria "
+                "e o título."
             )
 
             return render_template(
@@ -477,15 +607,19 @@ def nova_noticia():
             "imagem"
         )
 
-        imagem = salvar_imagem(
-            arquivo
-        )
+        try:
 
-        if imagem is None:
+            imagem = salvar_imagem(
+                arquivo
+            )
+
+        except Exception as erro_upload:
 
             erro = (
-                "Não foi possível enviar a imagem. "
-                "Use JPG, JPEG, PNG ou WEBP."
+                "Erro ao enviar a imagem: "
+                + str(
+                    erro_upload
+                )
             )
 
             return render_template(
@@ -530,13 +664,20 @@ def nova_noticia():
 )
 def editar_noticia(id):
 
-    if not session.get("admin"):
+    if not session.get(
+        "admin"
+    ):
 
         return redirect(
-            url_for("admin")
+            url_for(
+                "admin"
+            )
         )
 
-    noticia = Noticia.query.get_or_404(id)
+    noticia = (
+        Noticia.query
+        .get_or_404(id)
+    )
 
     erro = None
 
@@ -544,32 +685,45 @@ def editar_noticia(id):
 
         categoria = (
             request.form
-            .get("categoria", "")
+            .get(
+                "categoria",
+                ""
+            )
             .strip()
         )
 
         titulo = (
             request.form
-            .get("titulo", "")
+            .get(
+                "titulo",
+                ""
+            )
             .strip()
         )
 
         resumo = (
             request.form
-            .get("resumo", "")
+            .get(
+                "resumo",
+                ""
+            )
             .strip()
         )
 
         conteudo = (
             request.form
-            .get("conteudo", "")
+            .get(
+                "conteudo",
+                ""
+            )
             .strip()
         )
 
         if not categoria or not titulo:
 
             erro = (
-                "Informe a categoria e o título."
+                "Informe a categoria "
+                "e o título."
             )
 
             return render_template(
@@ -587,17 +741,26 @@ def editar_noticia(id):
             "imagem"
         )
 
-        if arquivo and arquivo.filename:
+        if (
+            arquivo
+            and arquivo.filename
+        ):
 
-            nova_imagem = salvar_imagem(
-                arquivo
-            )
+            try:
 
-            if nova_imagem is None:
+                nova_imagem = (
+                    salvar_imagem(
+                        arquivo
+                    )
+                )
+
+            except Exception as erro_upload:
 
                 erro = (
-                    "Não foi possível enviar a imagem. "
-                    "Use JPG, JPEG, PNG ou WEBP."
+                    "Erro ao enviar a imagem: "
+                    + str(
+                        erro_upload
+                    )
                 )
 
                 return render_template(
@@ -606,9 +769,13 @@ def editar_noticia(id):
                     erro=erro
                 )
 
-            imagem_antiga = noticia.imagem
+            imagem_antiga = (
+                noticia.imagem
+            )
 
-            noticia.imagem = nova_imagem
+            noticia.imagem = (
+                nova_imagem
+            )
 
             db.session.commit()
 
@@ -644,15 +811,24 @@ def editar_noticia(id):
 )
 def excluir_noticia(id):
 
-    if not session.get("admin"):
+    if not session.get(
+        "admin"
+    ):
 
         return redirect(
-            url_for("admin")
+            url_for(
+                "admin"
+            )
         )
 
-    noticia = Noticia.query.get_or_404(id)
+    noticia = (
+        Noticia.query
+        .get_or_404(id)
+    )
 
-    imagem = noticia.imagem
+    imagem = (
+        noticia.imagem
+    )
 
     db.session.delete(
         noticia
@@ -665,7 +841,9 @@ def excluir_noticia(id):
     )
 
     return redirect(
-        url_for("painel")
+        url_for(
+            "painel"
+        )
     )
 
 
@@ -679,10 +857,14 @@ def excluir_noticia(id):
 )
 def novo_patrocinador():
 
-    if not session.get("admin"):
+    if not session.get(
+        "admin"
+    ):
 
         return redirect(
-            url_for("admin")
+            url_for(
+                "admin"
+            )
         )
 
     erro = None
@@ -691,20 +873,27 @@ def novo_patrocinador():
 
         nome = (
             request.form
-            .get("nome", "")
+            .get(
+                "nome",
+                ""
+            )
             .strip()
         )
 
         link = (
             request.form
-            .get("link", "")
+            .get(
+                "link",
+                ""
+            )
             .strip()
         )
 
         if not nome:
 
             erro = (
-                "Informe o nome do patrocinador."
+                "Informe o nome "
+                "do patrocinador."
             )
 
             return render_template(
@@ -716,15 +905,19 @@ def novo_patrocinador():
             "imagem"
         )
 
-        imagem = salvar_imagem(
-            arquivo
-        )
+        try:
 
-        if imagem is None:
+            imagem = salvar_imagem(
+                arquivo
+            )
+
+        except Exception as erro_upload:
 
             erro = (
-                "Não foi possível enviar a imagem. "
-                "Use JPG, JPEG, PNG ou WEBP."
+                "Erro ao enviar a imagem: "
+                + str(
+                    erro_upload
+                )
             )
 
             return render_template(
@@ -746,7 +939,9 @@ def novo_patrocinador():
         db.session.commit()
 
         return redirect(
-            url_for("painel")
+            url_for(
+                "painel"
+            )
         )
 
     return render_template(
@@ -765,10 +960,14 @@ def novo_patrocinador():
 )
 def excluir_patrocinador(id):
 
-    if not session.get("admin"):
+    if not session.get(
+        "admin"
+    ):
 
         return redirect(
-            url_for("admin")
+            url_for(
+                "admin"
+            )
         )
 
     patrocinador = (
@@ -776,7 +975,9 @@ def excluir_patrocinador(id):
         .get_or_404(id)
     )
 
-    imagem = patrocinador.imagem
+    imagem = (
+        patrocinador.imagem
+    )
 
     db.session.delete(
         patrocinador
@@ -789,15 +990,19 @@ def excluir_patrocinador(id):
     )
 
     return redirect(
-        url_for("painel")
+        url_for(
+            "painel"
+        )
     )
 
 
 # ============================================================
-# SAIR
+# SAIR DO PAINEL
 # ============================================================
 
-@app.route("/admin/sair")
+@app.route(
+    "/admin/sair"
+)
 def sair():
 
     session.pop(
@@ -806,12 +1011,14 @@ def sair():
     )
 
     return redirect(
-        url_for("admin")
+        url_for(
+            "admin"
+        )
     )
 
 
 # ============================================================
-# ERRO DE IMAGEM GRANDE
+# ERRO: IMAGEM MAIOR QUE 10 MB
 # ============================================================
 
 @app.errorhandler(413)
@@ -825,7 +1032,7 @@ def arquivo_grande(error):
 
 
 # ============================================================
-# INICIAR
+# INICIAR APLICAÇÃO
 # ============================================================
 
 if __name__ == "__main__":
