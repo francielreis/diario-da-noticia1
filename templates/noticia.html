@@ -12,7 +12,33 @@
     <meta name="description"
           content="{{ noticia.resumo }}">
 
-    <!-- Compartilhamento -->
+    <!-- =========================================
+         PREPARAR URL DA IMAGEM
+    ========================================== -->
+
+    {% if noticia.imagem %}
+
+        {% if noticia.imagem.startswith('http://') or noticia.imagem.startswith('https://') %}
+
+            {% set imagem_url = noticia.imagem %}
+
+        {% elif noticia.imagem.startswith('/') %}
+
+            {% set imagem_url = request.url_root.rstrip('/') ~ noticia.imagem %}
+
+        {% else %}
+
+            {% set imagem_url = request.url_root.rstrip('/') ~ '/' ~ noticia.imagem %}
+
+        {% endif %}
+
+    {% endif %}
+
+
+    <!-- =========================================
+         COMPARTILHAMENTO
+    ========================================== -->
+
     <meta property="og:title"
           content="{{ noticia.titulo }}">
 
@@ -25,15 +51,44 @@
     <meta property="og:url"
           content="{{ request.url }}">
 
+    <meta property="og:site_name"
+          content="Diário da Notícia">
+
     {% if noticia.imagem %}
+
     <meta property="og:image"
-          content="{{ request.url_root.rstrip('/') }}{{ noticia.imagem }}">
+          content="{{ imagem_url }}">
+
     {% endif %}
+
+
+    <!-- TWITTER / X -->
+
+    <meta name="twitter:card"
+          content="summary_large_image">
+
+    <meta name="twitter:title"
+          content="{{ noticia.titulo }}">
+
+    <meta name="twitter:description"
+          content="{{ noticia.resumo }}">
+
+    {% if noticia.imagem %}
+
+    <meta name="twitter:image"
+          content="{{ imagem_url }}">
+
+    {% endif %}
+
 
     <style>
 
         * {
             box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -43,6 +98,11 @@
             color: #222;
         }
 
+
+        /* =========================================
+           CABEÇALHO
+        ========================================== */
+
         header {
             background: #111827;
             color: white;
@@ -51,11 +111,11 @@
         .topo {
             max-width: 1000px;
             margin: auto;
-            padding: 20px;
+            padding: 25px 20px;
         }
 
         .logo {
-            font-size: 26px;
+            font-size: 30px;
             font-weight: bold;
             text-decoration: none;
             color: white;
@@ -65,9 +125,14 @@
             color: #ef4444;
         }
 
+
+        /* =========================================
+           MENU
+        ========================================== */
+
         nav {
             background: #dc2626;
-            padding: 12px 20px;
+            padding: 15px 20px;
         }
 
         nav div {
@@ -78,94 +143,134 @@
         nav a {
             color: white;
             font-weight: bold;
+            font-size: 17px;
             text-decoration: none;
         }
 
+
+        /* =========================================
+           CONTAINER
+        ========================================== */
+
         .container {
             max-width: 900px;
-            margin: 30px auto;
+            margin: 35px auto;
             padding: 0 18px;
         }
 
+
+        /* =========================================
+           NOTÍCIA
+        ========================================== */
+
         .materia {
             background: white;
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 3px 15px rgba(0,0,0,.08);
+            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+        }
+
+
+        /* =========================================
+           IMAGEM
+        ========================================== */
+
+        .imagem-container {
+            width: 100%;
+            background: #e5e7eb;
         }
 
         .imagem-principal {
             width: 100%;
-            max-height: 520px;
+            max-height: 600px;
             object-fit: cover;
             display: block;
         }
 
+
+        /* =========================================
+           CONTEÚDO
+        ========================================== */
+
         .conteudo {
-            padding: 28px;
+            padding: 32px;
         }
 
         .categoria {
             color: #dc2626;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 14px;
+            font-size: 15px;
+            margin-bottom: 10px;
         }
 
         h1 {
-            font-size: 37px;
+            font-size: 40px;
             line-height: 1.15;
-            margin: 10px 0 15px;
+            margin: 10px 0 18px;
+            color: #222;
         }
 
         .resumo {
             color: #555;
-            font-size: 19px;
-            line-height: 1.5;
-            margin-bottom: 15px;
+            font-size: 20px;
+            line-height: 1.55;
+            margin-bottom: 18px;
         }
 
         .data {
             color: #888;
-            font-size: 14px;
-            padding-bottom: 20px;
+            font-size: 15px;
+            padding-bottom: 22px;
             border-bottom: 1px solid #eee;
         }
 
         .texto {
-            font-size: 18px;
+            font-size: 19px;
             line-height: 1.8;
-            margin-top: 25px;
+            margin-top: 30px;
             white-space: pre-line;
+            overflow-wrap: break-word;
         }
 
-        /* COMPARTILHAMENTO */
+
+        /* =========================================
+           COMPARTILHAMENTO
+        ========================================== */
 
         .compartilhar {
-            margin-top: 35px;
-            padding-top: 20px;
+            margin-top: 40px;
+            padding-top: 25px;
             border-top: 1px solid #eee;
         }
 
         .compartilhar h3 {
             margin-top: 0;
+            margin-bottom: 18px;
+            font-size: 20px;
         }
 
         .botoes {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
         .btn {
             display: inline-block;
             border: none;
-            padding: 12px 18px;
-            border-radius: 7px;
+            padding: 13px 20px;
+            border-radius: 8px;
             font-size: 15px;
             font-weight: bold;
             cursor: pointer;
             text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.88;
+            transform: translateY(-1px);
         }
 
         .whatsapp {
@@ -183,42 +288,91 @@
             color: white;
         }
 
+
+        /* =========================================
+           VOLTAR
+        ========================================== */
+
         .voltar {
             display: inline-block;
-            margin-top: 25px;
+            margin-top: 30px;
             color: #dc2626;
             font-weight: bold;
             text-decoration: none;
+            font-size: 16px;
         }
+
+
+        /* =========================================
+           RODAPÉ
+        ========================================== */
 
         footer {
             background: #111827;
             color: white;
             text-align: center;
-            margin-top: 50px;
-            padding: 30px 20px;
+            margin-top: 55px;
+            padding: 35px 20px;
         }
+
+        footer strong {
+            font-size: 20px;
+        }
+
+        footer p {
+            margin: 8px 0;
+            color: #d1d5db;
+        }
+
+
+        /* =========================================
+           CELULAR
+        ========================================== */
 
         @media (max-width: 600px) {
 
-            h1 {
-                font-size: 28px;
+            .topo {
+                padding: 22px 20px;
             }
 
-            .resumo {
-                font-size: 17px;
+            .logo {
+                font-size: 25px;
             }
 
-            .texto {
-                font-size: 17px;
+            .container {
+                margin: 25px auto;
+                padding: 0 12px;
+            }
+
+            .materia {
+                border-radius: 10px;
             }
 
             .conteudo {
-                padding: 20px;
+                padding: 22px;
+            }
+
+            h1 {
+                font-size: 29px;
+                line-height: 1.18;
+            }
+
+            .resumo {
+                font-size: 18px;
+            }
+
+            .texto {
+                font-size: 18px;
+                line-height: 1.75;
             }
 
             .imagem-principal {
-                max-height: 350px;
+                max-height: 420px;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
             }
 
         }
@@ -227,7 +381,13 @@
 
 </head>
 
+
 <body>
+
+
+<!-- =========================================
+     CABEÇALHO
+========================================== -->
 
 <header>
 
@@ -241,29 +401,53 @@
 
 </header>
 
+
+<!-- =========================================
+     MENU
+========================================== -->
+
 <nav>
 
     <div>
+
         <a href="/">
             ← Voltar para o portal
         </a>
+
     </div>
 
 </nav>
+
+
+<!-- =========================================
+     NOTÍCIA
+========================================== -->
 
 <main class="container">
 
     <article class="materia">
 
+
+        <!-- IMAGEM -->
+
         {% if noticia.imagem %}
 
-        <img
-            class="imagem-principal"
-            src="{{ noticia.imagem }}"
-            alt="{{ noticia.titulo }}"
-        >
+        <div class="imagem-container">
+
+            <img
+                class="imagem-principal"
+                src="{{ imagem_url }}"
+                alt="{{ noticia.titulo }}"
+                loading="eager"
+                onerror="this.parentElement.style.display='none';"
+            >
+
+        </div>
 
         {% endif %}
+
+
+        <!-- CONTEÚDO -->
 
         <div class="conteudo">
 
@@ -271,13 +455,20 @@
                 {{ noticia.categoria }}
             </div>
 
+
             <h1>
                 {{ noticia.titulo }}
             </h1>
 
+
+            {% if noticia.resumo %}
+
             <div class="resumo">
                 {{ noticia.resumo }}
             </div>
+
+            {% endif %}
+
 
             <div class="data">
 
@@ -292,11 +483,19 @@
 
             </div>
 
+
+            {% if noticia.conteudo %}
+
             <div class="texto">
                 {{ noticia.conteudo }}
             </div>
 
-            <!-- COMPARTILHAR -->
+            {% endif %}
+
+
+            <!-- =========================================
+                 COMPARTILHAMENTO
+            ========================================== -->
 
             <div class="compartilhar">
 
@@ -306,14 +505,20 @@
 
                 <div class="botoes">
 
+
+                    <!-- WHATSAPP -->
+
                     <a
                         class="btn whatsapp"
                         target="_blank"
                         rel="noopener noreferrer"
                         href="https://wa.me/?text={{ (noticia.titulo ~ ' - ' ~ request.url)|urlencode }}"
                     >
-                        📲 WhatsApp
+                        📲 Compartilhar no WhatsApp
                     </a>
+
+
+                    <!-- FACEBOOK -->
 
                     <a
                         class="btn facebook"
@@ -323,6 +528,9 @@
                     >
                         Facebook
                     </a>
+
+
+                    <!-- COPIAR LINK -->
 
                     <button
                         class="btn copiar"
@@ -336,6 +544,7 @@
 
             </div>
 
+
             <a class="voltar" href="/">
                 ← Ver outras notícias
             </a>
@@ -345,6 +554,11 @@
     </article>
 
 </main>
+
+
+<!-- =========================================
+     RODAPÉ
+========================================== -->
 
 <footer>
 
@@ -362,6 +576,11 @@
 
 </footer>
 
+
+<!-- =========================================
+     JAVASCRIPT
+========================================== -->
+
 <script>
 
 function copiarLink() {
@@ -370,7 +589,7 @@ function copiarLink() {
         .writeText(window.location.href)
         .then(function() {
 
-            alert("Link da notícia copiado!");
+            alert("Link da notícia copiado com sucesso!");
 
         })
         .catch(function() {
@@ -386,5 +605,7 @@ function copiarLink() {
 
 </script>
 
+
 </body>
+
 </html>
