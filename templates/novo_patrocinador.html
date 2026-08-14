@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Novo Patrocinador | Diário da Notícia
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f5f7;
+            color: #222;
+        }
+
+        header {
+            background: #b90000;
+            color: white;
+            padding: 22px 20px;
+        }
+
+        .topo {
+            max-width: 700px;
+            margin: auto;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        header p {
+            margin: 7px 0 0;
+            opacity: .9;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 0 18px;
+        }
+
+        .formulario {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,.08);
+        }
+
+        .formulario h2 {
+            margin-top: 0;
+        }
+
+        .descricao {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 18px;
+            margin-bottom: 7px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #b90000;
+        }
+
+        .ajuda {
+            display: block;
+            color: #777;
+            font-size: 13px;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .erro {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 20px;
+        }
+
+        .preview {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .preview img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .botao {
+            width: 100%;
+            margin-top: 25px;
+            border: none;
+            background: #b90000;
+            color: white;
+            padding: 14px;
+            border-radius: 7px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .botao:hover {
+            background: #990000;
+        }
+
+        .voltar {
+            display: inline-block;
+            margin-top: 20px;
+            color: #b90000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 50px;
+            background: #111827;
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="topo">
+
+        <h1>
+            DIÁRIO DA NOTÍCIA
+        </h1>
+
+        <p>
+            Painel Administrativo
+        </p>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <div class="formulario">
+
+        <h2>
+            📢 Novo patrocinador
+        </h2>
+
+        <p class="descricao">
+            Cadastre uma empresa ou anunciante para aparecer
+            na área de patrocinadores do Diário da Notícia.
+        </p>
+
+
+        {% if erro %}
+
+            <div class="erro">
+                {{ erro }}
+            </div>
+
+        {% endif %}
+
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+
+            <label for="nome">
+                Nome do patrocinador *
+            </label>
+
+            <input
+                type="text"
+                id="nome"
+                name="nome"
+                placeholder="Ex.: Casa das Rações Reis"
+                required
+            >
+
+
+            <label for="imagem">
+                Logo ou banner *
+            </label>
+
+            <input
+                type="file"
+                id="imagem"
+                name="imagem"
+                accept=".jpg,.jpeg,.png,.webp,image/*"
+                required
+                onchange="mostrarImagem(event)"
+            >
+
+            <small class="ajuda">
+                Escolha uma imagem da galeria do celular.
+                Formatos: JPG, PNG ou WEBP.
+            </small>
+
+
+            <div
+                class="preview"
+                id="preview"
+            >
+
+                <img
+                    id="imagem-preview"
+                    alt="Prévia do patrocinador"
+                >
+
+            </div>
+
+
+            <label for="link">
+                Link do patrocinador
+            </label>
+
+            <input
+                type="url"
+                id="link"
+                name="link"
+                placeholder="https://..."
+            >
+
+            <small class="ajuda">
+                Quando o visitante tocar no anúncio,
+                será direcionado para esse endereço.
+            </small>
+
+
+            <button
+                class="botao"
+                type="submit"
+            >
+                📢 Cadastrar patrocinador
+            </button>
+
+        </form>
+
+
+        <a
+            class="voltar"
+            href="/admin/painel"
+        >
+            ← Voltar para o painel
+        </a>
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    <strong>
+        DIÁRIO DA NOTÍCIA
+    </strong>
+
+    <p>
+        © 2026 Diário da Notícia
+    </p>
+
+</footer>
+
+
+<script>
+
+function mostrarImagem(event) {
+
+    const arquivo = event.target.files[0];
+
+    if (!arquivo) {
+        return;
+    }
+
+    const preview = document.getElementById("preview");
+
+    const imagem = document.getElementById(
+        "imagem-preview"
+    );
+
+    imagem.src = URL.createObjectURL(arquivo);
+
+    preview.style.display = "block";
+
+}
+
+</script>
+
+</body>
+
+</html>
