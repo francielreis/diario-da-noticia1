@@ -1,10 +1,27 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.utils import secure_filename
 import os
 
 app = Flask(__name__)
 
 # Chave para manter o administrador logado
 app.secret_key = os.environ.get("SECRET_KEY", "troque-esta-chave-depois")
+
+# Pasta onde as imagens enviadas serão salvas
+UPLOAD_FOLDER = "static/uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+# Extensões permitidas para imagens
+EXTENSOES_PERMITIDAS = {"png", "jpg", "jpeg", "webp"}
+
+
+def arquivo_permitido(nome_arquivo):
+    return (
+        "." in nome_arquivo
+        and nome_arquivo.rsplit(".", 1)[1].lower() in EXTENSOES_PERMITIDAS
+    )
 
 
 # Notícias iniciais do portal
@@ -82,12 +99,41 @@ def nova_noticia():
     if not session.get("admin"):
         return redirect(url_for("admin"))
 
+    erro = None
+
     if request.method == "POST":
         categoria = request.form.get("categoria")
         titulo = request.form.get("titulo")
         resumo = request.form.get("resumo")
         conteudo = request.form.get("conteudo")
-        imagem = request.form.get("imagem")
+
+        arquivo = request.files.get("imagem")
+
+        imagem = ""
+
+        if arquivo and arquivo.filename:
+            if arquivo_permitido(arquivo.filename):
+                nome_arquivo = secure_filename(arquivo.filename)
+
+                caminho = os.path.join(
+                    app.config["UPLOAD_FOLDER"],
+                    nome_arquivo
+                )
+
+                arquivo.save(caminho)
+
+                imagem = url_for(
+                    "static",
+                    filename=f"uploads/{nome_arquivo}"
+                )
+            else:
+                erro = "Formato de imagem não permitido."
+
+        if erro:
+            return render_template(
+                "nova_noticia.html",
+                erro=erro
+            )
 
         nova = {
             "categoria": categoria,
@@ -101,7 +147,7 @@ def nova_noticia():
 
         return redirect(url_for("inicio"))
 
-    return render_template("nova_noticia.html")
+    return render_template("nova_noticia.html", erro=erro)
 
 
 # Sair do painel
@@ -114,4 +160,8 @@ def sair():
 # Iniciar aplicação
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+
+    app.run(
+        host="0.0.0.0",
+        port=port
+    )
