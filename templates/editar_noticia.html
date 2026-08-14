@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Editar Notícia | Diário da Notícia</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+        }
+
+        header {
+            background: #c90000;
+            color: white;
+            padding: 22px 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 27px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 750px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .formulario {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 30px;
+        }
+
+        .descricao {
+            color: #666;
+            font-size: 17px;
+            line-height: 1.5;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 22px;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 9px;
+            font-size: 17px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border: 2px solid #c90000;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .resumo {
+            min-height: 140px;
+        }
+
+        .conteudo {
+            min-height: 320px;
+        }
+
+        .foto-atual {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .aviso {
+            background: #fff3cd;
+            padding: 14px;
+            border-radius: 8px;
+            margin-top: 12px;
+            color: #664d03;
+            line-height: 1.5;
+        }
+
+        .erro {
+            padding: 14px;
+            background: #ffd9d9;
+            color: #900;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .salvar {
+            width: 100%;
+            border: 0;
+            background: #d71920;
+            color: white;
+            padding: 17px;
+            margin-top: 25px;
+            border-radius: 10px;
+            font-size: 19px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .voltar {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 15px auto;
+                padding: 12px;
+            }
+
+            .formulario {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Diário da Notícia</h1>
+</header>
+
+<div class="container">
+
+    <div class="formulario">
+
+        <h2>✏️ Editar notícia</h2>
+
+        <p class="descricao">
+            Altere as informações da matéria ou envie novamente
+            uma foto que tenha desaparecido.
+        </p>
+
+        {% if erro %}
+        <div class="erro">
+            {{ erro }}
+        </div>
+        {% endif %}
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <label for="categoria">
+                Categoria
+            </label>
+
+            <select
+                id="categoria"
+                name="categoria"
+                required
+            >
+
+                <option
+                    value="Piauí"
+                    {% if noticia.categoria == "Piauí" %}selected{% endif %}
+                >
+                    Piauí
+                </option>
+
+                <option
+                    value="Política"
+                    {% if noticia.categoria == "Política" %}selected{% endif %}
+                >
+                    Política
+                </option>
+
+                <option
+                    value="Cidades"
+                    {% if noticia.categoria == "Cidades" %}selected{% endif %}
+                >
+                    Cidades
+                </option>
+
+                <option
+                    value="Economia"
+                    {% if noticia.categoria == "Economia" %}selected{% endif %}
+                >
+                    Economia
+                </option>
+
+                <option
+                    value="Educação"
+                    {% if noticia.categoria == "Educação" %}selected{% endif %}
+                >
+                    Educação
+                </option>
+
+                <option
+                    value="Esportes"
+                    {% if noticia.categoria == "Esportes" %}selected{% endif %}
+                >
+                    Esportes
+                </option>
+
+                <option
+                    value="Saúde"
+                    {% if noticia.categoria == "Saúde" %}selected{% endif %}
+                >
+                    Saúde
+                </option>
+
+                <option
+                    value="Brasil"
+                    {% if noticia.categoria == "Brasil" %}selected{% endif %}
+                >
+                    Brasil
+                </option>
+
+                <option
+                    value="Tecnologia"
+                    {% if noticia.categoria == "Tecnologia" %}selected{% endif %}
+                >
+                    Tecnologia
+                </option>
+
+            </select>
+
+            <label for="titulo">
+                Título da notícia
+            </label>
+
+            <input
+                id="titulo"
+                type="text"
+                name="titulo"
+                value="{{ noticia.titulo }}"
+                required
+            >
+
+            <label for="resumo">
+                Resumo
+            </label>
+
+            <textarea
+                id="resumo"
+                name="resumo"
+                class="resumo"
+            >{{ noticia.resumo or '' }}</textarea>
+
+            <label for="conteudo">
+                Conteúdo da matéria
+            </label>
+
+            <textarea
+                id="conteudo"
+                name="conteudo"
+                class="conteudo"
+            >{{ noticia.conteudo or '' }}</textarea>
+
+            <label>
+                Foto atual
+            </label>
+
+            {% if noticia.imagem %}
+
+            <img
+                src="{{ noticia.imagem }}"
+                class="foto-atual"
+                alt="Foto da notícia"
+                onerror="
+                    this.style.display='none';
+                    document.getElementById('foto-sumiu').style.display='block';
+                "
+            >
+
+            <div
+                id="foto-sumiu"
+                class="aviso"
+                style="display:none;"
+            >
+                ⚠️ A foto antiga não está mais disponível.
+                Selecione novamente a imagem abaixo.
+            </div>
+
+            {% else %}
+
+            <div class="aviso">
+                Esta notícia não possui uma foto cadastrada.
+            </div>
+
+            {% endif %}
+
+            <label for="imagem">
+                Enviar nova foto
+            </label>
+
+            <input
+                id="imagem"
+                type="file"
+                name="imagem"
+                accept="image/png,image/jpeg,image/webp"
+            >
+
+            <div class="aviso">
+                📷 Se a foto antiga desapareceu, selecione novamente
+                a imagem no seu celular. O título, resumo e conteúdo
+                da notícia serão mantidos.
+            </div>
+
+            <button
+                class="salvar"
+                type="submit"
+            >
+                💾 Salvar alterações
+            </button>
+
+        </form>
+
+        <a
+            href="{{ url_for('painel') }}"
+            class="voltar"
+        >
+            ← Voltar para o painel
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
