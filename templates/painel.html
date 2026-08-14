@@ -35,7 +35,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: auto;
             padding: 25px 18px;
         }
@@ -48,6 +48,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 15px;
+            margin-bottom: 35px;
         }
 
         .card {
@@ -57,7 +58,7 @@
             border-radius: 10px;
             text-decoration: none;
             color: #222;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
         .card:hover {
@@ -78,6 +79,56 @@
             font-size: 14px;
         }
 
+        .secao {
+            margin-top: 35px;
+        }
+
+        .secao h2 {
+            border-left: 5px solid #b90000;
+            padding-left: 10px;
+        }
+
+        .item {
+            background: white;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        }
+
+        .item h3 {
+            margin: 0 0 8px;
+        }
+
+        .item p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .miniatura {
+            width: 120px;
+            max-height: 90px;
+            object-fit: cover;
+            border-radius: 7px;
+            margin-top: 10px;
+        }
+
+        .acoes {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-excluir {
+            background: #c62828;
+            color: white;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
         .sair {
             margin-top: 30px;
             display: inline-block;
@@ -92,6 +143,13 @@
             color: white;
             display: inline-block;
             margin-top: 12px;
+        }
+
+        .vazio {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            color: #666;
         }
     </style>
 </head>
@@ -111,40 +169,152 @@
 
     <div class="titulo">
         <h2>Bem-vindo ao painel</h2>
-        <p>Gerencie o conteúdo do seu portal.</p>
+        <p>Gerencie notícias e patrocinadores do portal.</p>
     </div>
 
     <div class="grid">
 
-        <!-- NOVA NOTÍCIA -->
         <a class="card" href="/admin/nova-noticia">
             <span>➕</span>
             <h3>Nova notícia</h3>
-            <p>Publique uma nova matéria no portal.</p>
+            <p>Publique uma nova matéria.</p>
         </a>
 
-        <!-- GERENCIAR NOTÍCIAS -->
-        <a class="card" href="#">
-            <span>📰</span>
-            <h3>Gerenciar notícias</h3>
-            <p>Edite ou exclua notícias publicadas.</p>
-        </a>
-
-        <!-- PATROCINADORES -->
-        <a class="card" href="#">
+        <a class="card" href="/admin/novo-patrocinador">
             <span>📢</span>
-            <h3>Patrocinadores</h3>
-            <p>Cadastre banners e anúncios.</p>
+            <h3>Novo patrocinador</h3>
+            <p>Cadastre banners, empresas e anúncios.</p>
         </a>
 
-        <!-- IMAGENS -->
-        <a class="card" href="#">
-            <span>🖼️</span>
-            <h3>Imagens</h3>
-            <p>Gerencie fotos utilizadas no portal.</p>
+        <a class="card" href="/">
+            <span>🌐</span>
+            <h3>Ver portal</h3>
+            <p>Confira como o site está aparecendo.</p>
         </a>
 
     </div>
+
+    <section class="secao">
+
+        <h2>📰 Notícias cadastradas</h2>
+
+        {% if noticias %}
+
+            {% for noticia in noticias %}
+
+                <div class="item">
+
+                    <h3>{{ noticia.titulo }}</h3>
+
+                    <p>
+                        <strong>Categoria:</strong>
+                        {{ noticia.categoria }}
+                    </p>
+
+                    <p>{{ noticia.resumo }}</p>
+
+                    {% if noticia.imagem %}
+                        <img
+                            class="miniatura"
+                            src="{{ noticia.imagem }}"
+                            alt="{{ noticia.titulo }}"
+                        >
+                    {% endif %}
+
+                    <div class="acoes">
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('excluir_noticia', id=noticia.id) }}"
+                            onsubmit="return confirm('Tem certeza que deseja excluir esta notícia?');"
+                        >
+
+                            <button
+                                class="btn-excluir"
+                                type="submit"
+                            >
+                                🗑️ Excluir
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="vazio">
+                Nenhuma notícia cadastrada ainda.
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <section class="secao">
+
+        <h2>📢 Patrocinadores cadastrados</h2>
+
+        {% if patrocinadores %}
+
+            {% for patrocinador in patrocinadores %}
+
+                <div class="item">
+
+                    <h3>{{ patrocinador.nome }}</h3>
+
+                    {% if patrocinador.link %}
+                        <p>
+                            <strong>Link:</strong>
+                            {{ patrocinador.link }}
+                        </p>
+                    {% endif %}
+
+                    {% if patrocinador.imagem %}
+                        <img
+                            class="miniatura"
+                            src="{{ patrocinador.imagem }}"
+                            alt="{{ patrocinador.nome }}"
+                        >
+                    {% endif %}
+
+                    <div class="acoes">
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('excluir_patrocinador', id=patrocinador.id) }}"
+                            onsubmit="return confirm('Tem certeza que deseja excluir este patrocinador?');"
+                        >
+
+                            <button
+                                class="btn-excluir"
+                                type="submit"
+                            >
+                                🗑️ Excluir
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="vazio">
+                Nenhum patrocinador cadastrado ainda.
+            </div>
+
+        {% endif %}
+
+    </section>
+
 
     <a class="sair" href="/admin/sair">
         🚪 Sair do painel
