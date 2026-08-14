@@ -1,15 +1,33 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
-import uuid
+
+import cloudinary
+import cloudinary.uploader
+
+
+# ============================================================
+# APLICATIVO
+# ============================================================
 
 app = Flask(__name__)
 
 app.secret_key = os.environ.get(
     "SECRET_KEY",
     "troque-esta-chave-depois"
+)
+
+
+# ============================================================
+# CLOUDINARY
+# ============================================================
+
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+    secure=True
 )
 
 
@@ -36,21 +54,8 @@ db = SQLAlchemy(app)
 
 
 # ============================================================
-# UPLOAD DE IMAGENS
+# CONFIGURAÇÃO DAS IMAGENS
 # ============================================================
-
-UPLOAD_FOLDER = os.path.join(
-    app.root_path,
-    "static",
-    "uploads"
-)
-
-os.makedirs(
-    UPLOAD_FOLDER,
-    exist_ok=True
-)
-
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # Máximo de 10 MB
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
@@ -72,6 +77,10 @@ def arquivo_permitido(nome_arquivo):
     )
 
 
+# ============================================================
+# SALVAR IMAGEM NO CLOUDINARY
+# ============================================================
+
 def salvar_imagem(arquivo):
 
     if not arquivo:
@@ -83,58 +92,109 @@ def salvar_imagem(arquivo):
     if not arquivo_permitido(arquivo.filename):
         return None
 
-    nome_seguro = secure_filename(
-        arquivo.filename
-    )
+    try:
 
-    extensao = (
-        nome_seguro
-        .rsplit(".", 1)[1]
-        .lower()
-    )
+        resultado = cloudinary.uploader.upload(
+            arquivo,
+            folder="diario-da-noticia",
+            resource_type="image"
+        )
 
-    nome_novo = (
-        f"{uuid.uuid4().hex}.{extensao}"
-    )
+        return resultado.get("secure_url")
 
-    caminho = os.path.join(
-        app.config["UPLOAD_FOLDER"],
-        nome_novo
-    )
+    except Exception as erro:
 
-    arquivo.save(caminho)
+        print(
+            "Erro ao enviar imagem para o Cloudinary:",
+            erro
+        )
 
-    return url_for(
-        "static",
-        filename=f"uploads/{nome_novo}"
-    )
+        return None
 
+
+# ============================================================
+# PEGAR PUBLIC ID DA IMAGEM CLOUDINARY
+# ============================================================
+
+def obter_public_id(caminho_imagem):
+
+    if not caminho_imagem:
+        return None
+
+    if "res.cloudinary.com" not in caminho_imagem:
+        return None
+
+    try:
+
+        partes = caminho_imagem.split("/upload/")
+
+        if len(partes) != 2:
+            return None
+
+        caminho = partes[1]
+
+        partes_caminho = caminho.split("/")
+
+        # Remove versão, exemplo:
+        # v1720000000
+        if (
+            partes_caminho
+            and partes_caminho[0].startswith("v")
+            and partes_caminho[0][1:].isdigit()
+        ):
+            partes_caminho = partes_caminho[1:]
+
+        caminho = "/".join(partes_caminho)
+
+        # Remove extensão
+        public_id = os.path.splitext(caminho)[0]
+
+        return public_id
+
+    except Exception as erro:
+
+        print(
+            "Erro ao identificar imagem:",
+            erro
+        )
+
+        return None
+
+
+# ============================================================
+# APAGAR IMAGEM
+# ============================================================
 
 def apagar_imagem(caminho_imagem):
 
     if not caminho_imagem:
         return
 
-    if not caminho_imagem.startswith(
-        "/static/uploads/"
-    ):
+    # Imagens antigas do Render.
+    # Não tenta excluir porque podem nem existir mais.
+    if caminho_imagem.startswith("/static/uploads/"):
         return
 
-    nome = os.path.basename(
+    public_id = obter_public_id(
         caminho_imagem
     )
 
-    caminho = os.path.join(
-        app.config["UPLOAD_FOLDER"],
-        nome
-    )
+    if not public_id:
+        return
 
-    if os.path.exists(caminho):
+    try:
 
-        try:
-            os.remove(caminho)
-        except OSError:
-            pass
+        cloudinary.uploader.destroy(
+            public_id,
+            resource_type="image"
+        )
+
+    except Exception as erro:
+
+        print(
+            "Erro ao apagar imagem do Cloudinary:",
+            erro
+        )
 
 
 # ============================================================
@@ -424,7 +484,7 @@ def nova_noticia():
         if imagem is None:
 
             erro = (
-                "Formato de imagem não permitido. "
+                "Não foi possível enviar a imagem. "
                 "Use JPG, JPEG, PNG ou WEBP."
             )
 
@@ -518,13 +578,11 @@ def editar_noticia(id):
                 erro=erro
             )
 
-        # Atualizar os textos
         noticia.categoria = categoria
         noticia.titulo = titulo
         noticia.resumo = resumo
         noticia.conteudo = conteudo
 
-        # Verificar se uma nova foto foi enviada
         arquivo = request.files.get(
             "imagem"
         )
@@ -538,7 +596,7 @@ def editar_noticia(id):
             if nova_imagem is None:
 
                 erro = (
-                    "Formato de imagem não permitido. "
+                    "Não foi possível enviar a imagem. "
                     "Use JPG, JPEG, PNG ou WEBP."
                 )
 
@@ -548,15 +606,19 @@ def editar_noticia(id):
                     erro=erro
                 )
 
-            # Apaga foto antiga se ela ainda existir
-            apagar_imagem(
-                noticia.imagem
-            )
+            imagem_antiga = noticia.imagem
 
-            # Salva endereço da nova foto
             noticia.imagem = nova_imagem
 
-        db.session.commit()
+            db.session.commit()
+
+            apagar_imagem(
+                imagem_antiga
+            )
+
+        else:
+
+            db.session.commit()
 
         return redirect(
             url_for(
@@ -590,15 +652,17 @@ def excluir_noticia(id):
 
     noticia = Noticia.query.get_or_404(id)
 
-    apagar_imagem(
-        noticia.imagem
-    )
+    imagem = noticia.imagem
 
     db.session.delete(
         noticia
     )
 
     db.session.commit()
+
+    apagar_imagem(
+        imagem
+    )
 
     return redirect(
         url_for("painel")
@@ -659,7 +723,7 @@ def novo_patrocinador():
         if imagem is None:
 
             erro = (
-                "Formato de imagem não permitido. "
+                "Não foi possível enviar a imagem. "
                 "Use JPG, JPEG, PNG ou WEBP."
             )
 
@@ -712,15 +776,17 @@ def excluir_patrocinador(id):
         .get_or_404(id)
     )
 
-    apagar_imagem(
-        patrocinador.imagem
-    )
+    imagem = patrocinador.imagem
 
     db.session.delete(
         patrocinador
     )
 
     db.session.commit()
+
+    apagar_imagem(
+        imagem
+    )
 
     return redirect(
         url_for("painel")
