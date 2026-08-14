@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>{{ noticia.titulo }} | Diário da Notícia</title>
+
+    <meta name="description"
+          content="{{ noticia.resumo }}">
+
+    <!-- Compartilhamento -->
+    <meta property="og:title"
+          content="{{ noticia.titulo }}">
+
+    <meta property="og:description"
+          content="{{ noticia.resumo }}">
+
+    <meta property="og:type"
+          content="article">
+
+    <meta property="og:url"
+          content="{{ request.url }}">
+
+    {% if noticia.imagem %}
+    <meta property="og:image"
+          content="{{ request.url_root.rstrip('/') }}{{ noticia.imagem }}">
+    {% endif %}
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+        }
+
+        .topo {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo span {
+            color: #ef4444;
+        }
+
+        nav {
+            background: #dc2626;
+            padding: 12px 20px;
+        }
+
+        nav div {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        nav a {
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 18px;
+        }
+
+        .materia {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 15px rgba(0,0,0,.08);
+        }
+
+        .imagem-principal {
+            width: 100%;
+            max-height: 520px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .conteudo {
+            padding: 28px;
+        }
+
+        .categoria {
+            color: #dc2626;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        h1 {
+            font-size: 37px;
+            line-height: 1.15;
+            margin: 10px 0 15px;
+        }
+
+        .resumo {
+            color: #555;
+            font-size: 19px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .data {
+            color: #888;
+            font-size: 14px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .texto {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-top: 25px;
+            white-space: pre-line;
+        }
+
+        /* COMPARTILHAMENTO */
+
+        .compartilhar {
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .compartilhar h3 {
+            margin-top: 0;
+        }
+
+        .botoes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 7px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .whatsapp {
+            background: #25d366;
+            color: white;
+        }
+
+        .facebook {
+            background: #1877f2;
+            color: white;
+        }
+
+        .copiar {
+            background: #333;
+            color: white;
+        }
+
+        .voltar {
+            display: inline-block;
+            margin-top: 25px;
+            color: #dc2626;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        footer {
+            background: #111827;
+            color: white;
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px 20px;
+        }
+
+        @media (max-width: 600px) {
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .resumo {
+                font-size: 17px;
+            }
+
+            .texto {
+                font-size: 17px;
+            }
+
+            .conteudo {
+                padding: 20px;
+            }
+
+            .imagem-principal {
+                max-height: 350px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="topo">
+
+        <a class="logo" href="/">
+            DIÁRIO DA <span>NOTÍCIA</span>
+        </a>
+
+    </div>
+
+</header>
+
+<nav>
+
+    <div>
+        <a href="/">
+            ← Voltar para o portal
+        </a>
+    </div>
+
+</nav>
+
+<main class="container">
+
+    <article class="materia">
+
+        {% if noticia.imagem %}
+
+        <img
+            class="imagem-principal"
+            src="{{ noticia.imagem }}"
+            alt="{{ noticia.titulo }}"
+        >
+
+        {% endif %}
+
+        <div class="conteudo">
+
+            <div class="categoria">
+                {{ noticia.categoria }}
+            </div>
+
+            <h1>
+                {{ noticia.titulo }}
+            </h1>
+
+            <div class="resumo">
+                {{ noticia.resumo }}
+            </div>
+
+            <div class="data">
+
+                Diário da Notícia
+
+                {% if noticia.data_publicacao %}
+
+                    •
+                    {{ noticia.data_publicacao.strftime('%d/%m/%Y às %H:%M') }}
+
+                {% endif %}
+
+            </div>
+
+            <div class="texto">
+                {{ noticia.conteudo }}
+            </div>
+
+            <!-- COMPARTILHAR -->
+
+            <div class="compartilhar">
+
+                <h3>
+                    Compartilhe esta notícia
+                </h3>
+
+                <div class="botoes">
+
+                    <a
+                        class="btn whatsapp"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://wa.me/?text={{ (noticia.titulo ~ ' - ' ~ request.url)|urlencode }}"
+                    >
+                        📲 WhatsApp
+                    </a>
+
+                    <a
+                        class="btn facebook"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://www.facebook.com/sharer/sharer.php?u={{ request.url|urlencode }}"
+                    >
+                        Facebook
+                    </a>
+
+                    <button
+                        class="btn copiar"
+                        type="button"
+                        onclick="copiarLink()"
+                    >
+                        🔗 Copiar link
+                    </button>
+
+                </div>
+
+            </div>
+
+            <a class="voltar" href="/">
+                ← Ver outras notícias
+            </a>
+
+        </div>
+
+    </article>
+
+</main>
+
+<footer>
+
+    <strong>
+        DIÁRIO DA NOTÍCIA
+    </strong>
+
+    <p>
+        Informação e credibilidade.
+    </p>
+
+    <p>
+        © 2026 Diário da Notícia
+    </p>
+
+</footer>
+
+<script>
+
+function copiarLink() {
+
+    navigator.clipboard
+        .writeText(window.location.href)
+        .then(function() {
+
+            alert("Link da notícia copiado!");
+
+        })
+        .catch(function() {
+
+            prompt(
+                "Copie o link da notícia:",
+                window.location.href
+            );
+
+        });
+
+}
+
+</script>
+
+</body>
+</html>
