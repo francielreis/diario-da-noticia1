@@ -290,7 +290,8 @@ def contexto_portal():
         'hoje_portal': (
             f'{agora.day} de {meses[agora.month - 1]} de {agora.year}'
         ),
-        'ano_portal': agora.year
+        'ano_portal': agora.year,
+        'instagram_url': 'https://www.instagram.com/diariodanoticia/'
     }
 
 
@@ -777,7 +778,7 @@ TEMPLATES = {
 </head>
 <body>
 <a class="skip" href="#conteudo">Ir para o conteúdo</a>
-<div class="topline"><div class="wrap"><time>{{ hoje_portal }}</time><span>Piauí · Brasil · Informação e credibilidade</span><a href="{{ url_for('admin') }}">Área da redação</a></div></div>
+<div class="topline"><div class="wrap"><time>{{ hoje_portal }}</time><span>Piauí · Brasil · Informação e credibilidade</span><a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram do Diário da Notícia">Instagram ↗</a><a href="{{ url_for('admin') }}">Área da redação</a></div></div>
 <header class="masthead wrap">
 <a class="brand" href="{{ url_for('inicio') }}" aria-label="Diário da Notícia — início"><span class="brand-over">DIÁRIO DA</span><strong>NOTÍCIA<span class="brand-dot">.</span></strong><span class="brand-tag">INFORMAÇÃO EM PRIMEIRO LUGAR</span></a>
 <form class="search" action="{{ url_for('inicio') }}" method="get" role="search"><label class="sr-only" for="busca-portal">Buscar notícias</label><input id="busca-portal" type="search" name="q" value="{{ busca|default('') }}" placeholder="O que você quer saber?" maxlength="200"><button type="submit">Buscar <span aria-hidden="true">↗</span></button></form>
@@ -788,7 +789,7 @@ TEMPLATES = {
 <footer class="footer" id="patrocinadores"><div class="wrap">
 <div class="footer-head"><a class="brand brand-footer" href="{{ url_for('inicio') }}"><span class="brand-over">DIÁRIO DA</span><strong>NOTÍCIA<span class="brand-dot">.</span></strong></a><p>O Piauí e a região em pauta.<br>Informação e credibilidade, todos os dias.</p></div>
 {% if patrocinadores %}<h2>Nossos patrocinadores</h2><div class="partner-grid">{% for p in patrocinadores %}<div class="partner">{% if p.link %}<a href="{{ p.link }}" target="_blank" rel="noopener noreferrer sponsored">{% endif %}{% if p.imagem %}<img src="{{ p.imagem }}" alt="{{ p.nome }}" loading="lazy">{% endif %}<strong>{{ p.nome }}</strong>{% if p.link %}</a>{% endif %}</div>{% endfor %}</div>{% endif %}
-<div class="footer-bottom"><span>© {{ ano_portal }} Diário da Notícia</span><a href="{{ url_for('admin') }}">Painel da redação</a><a href="#conteudo">Voltar ao topo ↑</a></div></div></footer>
+<div class="footer-bottom"><span>© {{ ano_portal }} Diário da Notícia</span><a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">Siga @diariodanoticia no Instagram ↗</a><a href="{{ url_for('admin') }}">Painel da redação</a><a href="#conteudo">Voltar ao topo ↑</a></div></div></footer>
 <script>
 document.querySelectorAll('[data-carousel]').forEach(function(area){
  const slides=Array.from(area.querySelectorAll('[data-slide]'));
@@ -874,21 +875,62 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
 <div class="content-columns"><article>
 {% if noticia.imagem %}<img class="article-image" src="{{ noticia.imagem }}" alt="{{ noticia.titulo }}" fetchpriority="high">{% endif %}
 <div class="article-text">{{ noticia.conteudo or noticia.resumo or '' }}</div>
-<section class="share" aria-label="Compartilhar notícia"><h2>Compartilhe esta notícia</h2><div class="share-buttons"><a class="whatsapp" href="https://wa.me/?text={{ (noticia.titulo ~ ' ' ~ url_for('noticia',id=noticia.id,_external=true))|urlencode }}" target="_blank" rel="noopener noreferrer">WhatsApp</a><a href="https://www.facebook.com/sharer/sharer.php?u={{ url_for('noticia',id=noticia.id,_external=true)|urlencode }}" target="_blank" rel="noopener noreferrer">Facebook</a><button type="button" id="copiar-link">Copiar link</button></div><p class="share-status" id="share-status" role="status"></p></section>
+<section class="share" aria-label="Compartilhar notícia">
+<h2>Compartilhe esta notícia</h2>
+<div class="share-buttons">
+<button type="button" id="compartilhar-noticia">Compartilhar notícia</button>
+<a class="whatsapp" href="https://wa.me/?text={{ (noticia.titulo ~ ' ' ~ url_for('noticia',id=noticia.id,_external=true))|urlencode }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+<a href="https://www.facebook.com/sharer/sharer.php?u={{ url_for('noticia',id=noticia.id,_external=true)|urlencode }}" target="_blank" rel="noopener noreferrer">Facebook</a>
+<button type="button" id="compartilhar-instagram">Compartilhar no Instagram</button>
+<button type="button" id="copiar-link">Copiar link</button>
+<a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">Visitar nosso Instagram ↗</a>
+</div>
+<p class="share-status">No celular, escolha o Instagram no menu, se ele aparecer. Você também pode copiar o link e colar em uma mensagem ou no adesivo de link dos Stories.</p>
+<p class="share-status" id="share-status" role="status" aria-live="polite"></p>
+<div id="link-manual" hidden><label for="link-noticia">Link da notícia</label><input id="link-noticia" type="text" readonly value="{{ url_for('noticia',id=noticia.id,_external=true) }}" style="display:block;width:100%;padding:12px;margin-top:8px" onclick="this.select()"></div>
+<noscript><p>Use WhatsApp, Facebook ou copie o endereço desta página para compartilhar.</p></noscript>
+</section>
 {% if patrocinadores %}<div class="inline-ad">{{ ad(patrocinadores[0]) }}</div>{% endif %}
 {% if relacionadas %}<section><div class="section-heading"><h2>Leia também</h2><a href="{{ url_for('inicio',categoria=noticia.categoria) }}">{{ noticia.categoria }} ↗</a></div><div class="related-grid">{% for n in relacionadas %}{{ card(n) }}{% endfor %}</div></section>{% endif %}
 </article><aside class="sidebar" aria-label="Mais notícias e patrocinadores">{% if patrocinadores %}<h2 class="side-title">Patrocinadores</h2>{% for p in patrocinadores %}{{ ad(p,true) }}{% endfor %}{% endif %}{% if ultimas %}<h2 class="side-title">Mais recentes</h2><div class="latest-list">{% for n in ultimas %}{{ card(n,true) }}{% endfor %}</div>{% endif %}</aside></div>
 {% endblock %}
 {% block scripts %}<script>
-document.getElementById('copiar-link').addEventListener('click',async function(){
+(function(){
  const link={{ url_for('noticia',id=noticia.id,_external=true)|tojson }};
- try{
-   await navigator.clipboard.writeText(link);
-   document.getElementById('share-status').textContent='Link copiado!';
- }catch(e){
-   document.getElementById('share-status').textContent='Copie este link: '+link;
+ const titulo={{ noticia.titulo|tojson }};
+ const status=document.getElementById('share-status');
+ const manual=document.getElementById('link-manual');
+ const campo=document.getElementById('link-noticia');
+ const instrucaoInstagram='Abra o Instagram e cole em uma mensagem ou no adesivo de link dos Stories.';
+ async function copiar(instagram){
+   try{
+     await navigator.clipboard.writeText(link);
+     manual.hidden=true;
+     status.textContent='Link copiado!'+(instagram?' '+instrucaoInstagram:'');
+   }catch(e){
+     manual.hidden=false;
+     campo.focus();
+     campo.select();
+     status.textContent='Selecione e copie o link abaixo.'+(instagram?' '+instrucaoInstagram:'');
+   }
  }
-});
+ async function compartilhar(instagram){
+   status.textContent='';
+   if(typeof navigator.share==='function'){
+     try{
+       await navigator.share({title:titulo,text:titulo,url:link});
+       status.textContent='Notícia enviada ao aplicativo escolhido.';
+       return;
+     }catch(e){
+       if(e.name==='AbortError')return;
+     }
+   }
+   await copiar(instagram);
+ }
+ document.getElementById('copiar-link').addEventListener('click',()=>copiar(false));
+ document.getElementById('compartilhar-noticia').addEventListener('click',()=>compartilhar(false));
+ document.getElementById('compartilhar-instagram').addEventListener('click',()=>compartilhar(true));
+})();
 </script>{% endblock %}
 """,
 
