@@ -233,6 +233,20 @@
             overflow-wrap: break-word;
         }
 
+        .texto a.link-materia {
+            color: #dc2626;
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .texto a.link-materia:hover,
+        .texto a.link-materia:focus {
+            color: #991b1b;
+        }
+
 
         /* =========================================
            COMPARTILHAMENTO
@@ -602,6 +616,106 @@ function copiarLink() {
         });
 
 }
+
+
+/* Transforma URLs escritas no texto da matéria em links clicáveis. */
+function linkificarTextoDaMateria() {
+
+    const container = document.querySelector(".texto");
+
+    if (!container) {
+        return;
+    }
+
+    const walker = document.createTreeWalker(
+        container,
+        NodeFilter.SHOW_TEXT
+    );
+
+    const nodes = [];
+
+    while (walker.nextNode()) {
+        nodes.push(walker.currentNode);
+    }
+
+    const urlRegex = /https?:\/\/[^\s<>"']+/g;
+
+    nodes.forEach(function(node) {
+
+        const texto = node.nodeValue;
+        let ultimoIndice = 0;
+        let encontrouLink = false;
+        let match;
+
+        urlRegex.lastIndex = 0;
+
+        const fragmento = document.createDocumentFragment();
+
+        while ((match = urlRegex.exec(texto)) !== null) {
+
+            encontrouLink = true;
+
+            let url = match[0];
+            let pontuacaoFinal = "";
+
+            while (/[.,;:!?)\]]$/.test(url)) {
+                pontuacaoFinal = url.slice(-1) + pontuacaoFinal;
+                url = url.slice(0, -1);
+            }
+
+            if (match.index > ultimoIndice) {
+                fragmento.appendChild(
+                    document.createTextNode(
+                        texto.slice(ultimoIndice, match.index)
+                    )
+                );
+            }
+
+            const link = document.createElement("a");
+
+            link.href = url;
+            link.textContent = url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.className = "link-materia";
+            link.setAttribute(
+                "aria-label",
+                "Abrir link: " + url
+            );
+
+            fragmento.appendChild(link);
+
+            if (pontuacaoFinal) {
+                fragmento.appendChild(
+                    document.createTextNode(pontuacaoFinal)
+                );
+            }
+
+            ultimoIndice = match.index + match[0].length;
+        }
+
+        if (!encontrouLink) {
+            return;
+        }
+
+        if (ultimoIndice < texto.length) {
+            fragmento.appendChild(
+                document.createTextNode(
+                    texto.slice(ultimoIndice)
+                )
+            );
+        }
+
+        node.parentNode.replaceChild(fragmento, node);
+
+    });
+
+}
+
+document.addEventListener(
+    "DOMContentLoaded",
+    linkificarTextoDaMateria
+);
 
 </script>
 
