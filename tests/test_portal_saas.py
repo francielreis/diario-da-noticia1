@@ -209,6 +209,58 @@ class TestePortaisSaaS(unittest.TestCase):
         self.assertEqual(self.cliente.post("/master/mensalidades/salvar", data={}).status_code, 302)
         self.assertEqual(self.cliente.get("/master/mensalidades").status_code, 302)
 
+    def test_master_entrar_no_cliente_sem_senha(self):
+        portal_id = self.criar_portal("portal-master", "Portal Master", "redator")
+        self.login_master()
+        resposta = self.cliente.post(
+            f"/master/portal/{portal_id}/entrar",
+            data={"_csrf_token": self.token()},
+        )
+        self.assertEqual(resposta.status_code, 303)
+        self.assertEqual(
+            resposta.headers["Location"],
+            "/p/portal-master/admin/painel",
+        )
+        self.assertEqual(self.cliente.get(resposta.headers["Location"]).status_code, 200)
+        self.assertEqual(self.cliente.get("/master/painel").status_code, 302)
+
+    def test_convite_acesso_temporario_uso_unico(self):
+        import hashlib
+        from datetime import datetime, timedelta
+        portal_id = self.criar_portal("picos-demo", "Portal Picos Demo", "editor-demo")
+        token = "AbcdefGhijKlmnOP0123456789_AbcdefghijklMN"
+        Convite = app.extensions["saas_models"]["convite_demo"]
+        with app.app_context():
+            db.session.add(Convite(
+                portal_id=portal_id,
+                token_hash=hashlib.sha256(token.encode("ascii")).hexdigest(),
+                expira_em=datetime.utcnow() + timedelta(hours=2),
+            ))
+            db.session.commit()
+        resposta = self.cliente.get("/convite-demo/" + token)
+        self.assertEqual(resposta.status_code, 303)
+        self.assertEqual(resposta.headers["Location"], "/p/picos-demo/admin/painel")
+        self.assertEqual(resposta.headers["Cache-Control"], "no-store")
+        self.assertEqual(self.cliente.get(resposta.headers["Location"]).status_code, 200)
+        resposta_repetida = self.cliente.get("/convite-demo/" + token)
+        self.assertEqual(resposta_repetida.status_code, 410)
+
+    def test_convite_expirado_nao_autentica(self):
+        import hashlib
+        from datetime import datetime, timedelta
+        portal_id = self.criar_portal("demo-expirado", "Expirado", "editor-demo")
+        token = "AAAbbbCCCdddEEEfff000111222333444xyz12345"
+        Convite = app.extensions["saas_models"]["convite_demo"]
+        with app.app_context():
+            db.session.add(Convite(
+                portal_id=portal_id,
+                token_hash=hashlib.sha256(token.encode("ascii")).hexdigest(),
+                expira_em=datetime.utcnow() - timedelta(minutes=1),
+            ))
+            db.session.commit()
+        self.assertEqual(self.cliente.get("/convite-demo/" + token).status_code, 410)
+        self.assertEqual(self.cliente.get("/p/demo-expirado/admin/painel").status_code, 302)
+
     def test_sem_csrf_nao_pode_criar(self):
         self.login_master()
         resposta = self.cliente.post("/master/criar", data={
