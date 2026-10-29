@@ -135,6 +135,50 @@ class TestePortaisSaaS(unittest.TestCase):
         self.assertEqual(resposta.status_code, 200)
         self.assertIn("Notícia preservada", resposta.get_data(as_text=True))
 
+    def test_personalizacao_nao_afeta_outro_portal(self):
+        a = self.criar_portal()
+        b = self.criar_portal("portal-b", "Portal B", "editor-b")
+        self.login_cliente("portal-a")
+        r = self.cliente.post("/p/portal-a/admin/configuracoes", data={
+            "_csrf_token": self.token(),
+            "slogan": "O melhor de Picos",
+            "cor": "#cc1133",
+        })
+        self.assertEqual(r.status_code, 302)
+        with app.app_context():
+            marca = app.extensions["saas_models"]["marca"]
+            self.assertEqual(db.session.query(marca).count(), 1)
+            self.assertEqual(db.session.query(marca).first().portal_id, a)
+        site_a = self.cliente.get("/p/portal-a/").get_data(as_text=True)
+        site_b = self.cliente.get("/p/portal-b/").get_data(as_text=True)
+        self.assertIn("O melhor de Picos", site_a)
+        self.assertIn("#cc1133", site_a)
+        self.assertNotIn("O melhor de Picos", site_b)
+
+    def test_anuncio_nao_pode_ser_alterado_por_outro_cliente(self):
+        a = self.criar_portal()
+        self.criar_portal("portal-b", "Portal B", "editor-b")
+        with app.app_context():
+            anuncio = app.extensions["saas_models"]["anuncio"](
+                portal_id=a, titulo="Patrocinador A",
+                imagem="https://res.cloudinary.com/exemplo/image/upload/a.webp",
+                ativo=True
+            )
+            db.session.add(anuncio)
+            db.session.commit()
+            id_anuncio = anuncio.id
+        self.login_cliente("portal-b", "editor-b")
+        res = self.cliente.post(
+            f"/p/portal-b/admin/anuncios/{id_anuncio}/alternar",
+            data={"_csrf_token": self.token()},
+        )
+        self.assertEqual(res.status_code, 404)
+        self.assertIn("Patrocinador A", self.cliente.get("/p/portal-a/").get_data(as_text=True))
+        self.assertNotIn("Patrocinador A", self.cliente.get("/p/portal-b/").get_data(as_text=True))
+        with app.app_context():
+            anuncio = app.extensions["saas_models"]["anuncio"]
+            self.assertTrue(db.session.query(anuncio).first().ativo)
+
     def test_sem_csrf_nao_pode_criar(self):
         self.login_master()
         resposta = self.cliente.post("/master/criar", data={
