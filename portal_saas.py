@@ -100,7 +100,10 @@ MASTER_PAINEL = r"""
 <div class="table-scroll"><table>
 <thead><tr><th>Portal</th><th>Responsável</th><th>Plano</th><th>Status / Gestão</th></tr></thead>
 <tbody>{% for p in portais %}<tr>
-<td><strong>{{ p.nome }}</strong><br><a href="{{ url_for('saas_portal',slug=p.slug) }}" target="_blank" rel="noopener">/p/{{ p.slug }}/</a><br><a href="{{ url_for('saas_cliente_login',slug=p.slug) }}" target="_blank" rel="noopener">Painel do cliente</a></td>
+<td><strong>{{ p.nome }}</strong><br><a href="{{ url_for('saas_portal',slug=p.slug) }}" target="_blank" rel="noopener">/p/{{ p.slug }}/</a><br><a href="{{ url_for('saas_cliente_login',slug=p.slug) }}" target="_blank" rel="noopener">Painel do cliente</a>
+<form method="post" action="{{ url_for('saas_master_entrar_como_cliente',portal_id=p.id) }}">
+<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+<button type="submit" class="secondary">Entrar sem senha como Master</button></form></td>
 <td>{{ p.dono }}</td><td>R$ {{ planos[p.plano] }}/mês</td>
 <td><span class="tag {{ 'active' if p.ativo else 'inactive' }}">{{ 'Ativo' if p.ativo else 'Suspenso' }}</span>
 <form method="post" action="{{ url_for('saas_master_alterar',portal_id=p.id) }}">
@@ -503,3 +506,7 @@ def register_portals(app, db, templates, csrf_token, exigir_csrf, salvar_imagem)
 
     from portal_saas_finance import register_finance
     register_finance(app, db, PortalCliente, master_required, exigir_csrf, pagina)
+
+    from portal_saas_demo_access import register_demo_access
+    register_demo_access(app, db, PortalCliente, master_required,
+                         exigir_csrf, csrf_token)
