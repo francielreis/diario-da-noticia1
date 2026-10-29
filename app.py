@@ -673,6 +673,36 @@ def novo_patrocinador():
     return render_template('novo_patrocinador.html', erro=erro)
 
 
+@app.route('/admin/editar-patrocinador/<int:id>', methods=['GET', 'POST'])
+@admin_required
+def editar_patrocinador(id):
+    patrocinador = db.get_or_404(Patrocinador, id)
+    erro = None
+
+    if request.method == 'POST':
+        exigir_csrf()
+        nome = request.form.get('nome', '').strip()
+        link = request.form.get('link', '').strip()
+        if not nome:
+            erro = 'Informe o nome do patrocinador.'
+        elif not link_http_valido(link):
+            erro = 'O link deve começar com http:// ou https://.'
+        else:
+            patrocinador.nome = nome
+            patrocinador.link = link or None
+            try:
+                db.session.commit()
+                return redirect(url_for('painel'))
+            except Exception:
+                db.session.rollback()
+                app.logger.exception('Falha ao editar patrocinador.')
+                erro = 'Não foi possível salvar o patrocinador.'
+
+    return render_template(
+        'editar_patrocinador.html', patrocinador=patrocinador, erro=erro
+    )
+
+
 @app.route('/admin/patrocinador/<int:id>/alternar', methods=['POST'])
 @admin_required
 def alternar_patrocinador(id):
@@ -1321,9 +1351,27 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
 <label for="imagem">Banner do patrocinador</label>
 <input id="imagem" type="file" name="imagem" accept="image/jpeg,image/png,image/webp" required>
 <p class="admin-help">Envie JPG, PNG ou WEBP com até 10 MB. O anúncio aparece no topo, na lateral e nos espaços de publicidade do portal.</p>
-<label for="link">Link do anunciante (opcional)</label>
+<label for="link">Link do anunciante (opcional — aparece abaixo do cartão)</label>
 <input id="link" name="link" type="url" placeholder="https://..." value="{{ request.form.get('link','') }}">
 <div class="admin-actions"><button class="admin-button red" type="submit">Cadastrar patrocinador</button><a class="admin-button" href="{{ url_for('painel') }}">Voltar ao painel</a></div>
+</form>
+{% endblock %}
+""",
+
+    'editar_patrocinador.html': r"""
+{% extends 'admin_base.html' %}
+{% block content %}
+<h1>Editar patrocinador</h1>
+<p class="admin-help">O link cadastrado aparece abaixo do cartão desse patrocinador.</p>
+{% if erro %}<p class="admin-help" role="alert" style="color:#b7192e">{{ erro }}</p>{% endif %}
+<form class="admin-form admin-box" method="post">
+<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+<label for="nome">Nome da empresa</label>
+<input id="nome" name="nome" maxlength="200" value="{{ request.form.get('nome', patrocinador.nome) }}" required>
+<label for="link">Link da empresa (opcional)</label>
+<input id="link" name="link" type="url" value="{{ request.form.get('link', patrocinador.link or '') }}" placeholder="https://exemplo.com.br">
+<p class="admin-help">Use o endereço completo. Pode ser site, Instagram ou WhatsApp. Deixe vazio para ocultar o link.</p>
+<div class="admin-actions"><button type="submit" class="admin-button red">Salvar alterações</button><a class="admin-button" href="{{ url_for('painel') }}">Voltar ao painel</a></div>
 </form>
 {% endblock %}
 """,
@@ -1363,6 +1411,7 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
 {% if p.imagem %}<img src="{{ p.imagem }}" alt="{{ p.nome }}">{% endif %}
 {% if p.link %}<p class="admin-help">{{ p.link }}</p>{% endif %}
 <div class="admin-actions">
+<a class="admin-button" href="{{ url_for('editar_patrocinador',id=p.id) }}">Editar nome / link</a>
 <form method="post" action="{{ url_for('alternar_patrocinador',id=p.id) }}">
 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 <button class="admin-button" type="submit">{{ 'Pausar anúncio' if p.ativo else 'Ativar anúncio' }}</button>
