@@ -1114,6 +1114,10 @@ def portal_css():
     return Response(PORTAL_CSS, mimetype='text/css')
 
 
+# Portais de clientes em tabelas próprias, sem modificar as notícias legadas.
+from portal_saas import register_portals
+register_portals(app, db, TEMPLATES, csrf_token, exigir_csrf, salvar_imagem)
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
