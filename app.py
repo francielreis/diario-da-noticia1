@@ -856,7 +856,7 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
  if(slides.length<2)return;
  let index=0;
  const count=area.querySelector('[data-count]');
- const interval=area.classList.contains('ad-side-rotation')?6500:5000;
+ const interval=3000; // Trocar banners do topo e da lateral a cada 3 segundos
  const prev=area.querySelector('[data-prev]');
  const next=area.querySelector('[data-next]');
  let mouseOver=false;
