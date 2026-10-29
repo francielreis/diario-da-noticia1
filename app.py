@@ -950,11 +950,11 @@ TEMPLATES = {
   </div>
   <section class="footer-sponsors" aria-labelledby="footer-sponsors-title">
     <div class="footer-sponsors-header">
-      <div><span class="footer-eyebrow">PARCEIROS DO PORTAL</span>
-        <h2 id="footer-sponsors-title">Nossos patrocinadores<span class="footer-title-dot">.</span></h2>
-        <p>Empresas que valorizam a informação regional.</p>
+      <div><span class="footer-eyebrow">PARCEIROS DA INFORMAÇÃO</span>
+        <h2 id="footer-sponsors-title">Patrocinadores oficiais do Diário da Notícia<span class="footer-title-dot">.</span></h2>
+        <p>Faça parte do nosso time e fortaleça a informação regional.</p>
       </div>
-      <a class="footer-advertise" href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">Anuncie sua marca <span aria-hidden="true">↗</span></a>
+      <a class="footer-advertise" href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">Seja um patrocinador <span aria-hidden="true">↗</span></a>
     </div>
     {% if patrocinadores %}
     <div class="footer-sponsor-board" aria-label="Quadro dos patrocinadores">
