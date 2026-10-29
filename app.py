@@ -851,6 +851,12 @@ PORTAL_CSS = r"""
 @media(max-width:740px){.topline .wrap{gap:8px;justify-content:space-between}.weather-widget{padding-left:0;border:0}.weather-widget .weather-temp{font-size:15px}.weather-widget .weather-city{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.ad-top [data-slide],.ad-side-rotation [data-slide]{animation:none}}
 
+/* Identificação da empresa responsável pelo desenvolvimento */
+.developer-credit-top{background:#17191f;border-bottom:2px solid #ba1828;color:#cbd0d9;padding:8px 16px;text-align:center;font-size:11px;letter-spacing:.18px;line-height:1.5}
+.developer-credit-top strong{color:#fff;font-weight:800;letter-spacing:.25px}
+.developer-credit-footer{display:flex;justify-content:center;text-align:center;margin-top:21px;padding:17px 8px 3px;border-top:1px solid #353b46;font-size:11px;line-height:1.65;letter-spacing:.2px;color:#abb4c3}
+.developer-credit-footer strong{color:#fff;font-weight:800}
+@media(max-width:600px){.developer-credit-top{padding:7px 12px;font-size:10px}.developer-credit-footer{font-size:10px;margin-top:19px}}
 /* Rodapé editorial profissional - Diário da Notícia */
 .footer{background:#15181e;color:#f6f7fa;margin-top:65px;padding:0 0 22px}
 .footer-accent{height:4px;background:linear-gradient(90deg,#b7192e 0%,#d7354a 40%,#222834 100%)}
@@ -949,6 +955,9 @@ TEMPLATES = {
 </head>
 <body id="topo-pagina">
 <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+<div class="developer-credit-top" role="note" aria-label="Créditos de tecnologia">
+  <span>Tecnologia desenvolvida por <strong>Reis Tech e Software</strong></span>
+</div>
 <div class="topline"><div class="wrap"><time>{{ hoje_portal }}</time><div class="weather-widget" aria-label="Previsão do tempo em Picos, PI"><span class="weather-icon" id="weather-icon" aria-hidden="true">🌤️</span><span class="weather-temp" id="weather-temperature">--°C</span><span class="weather-city">Picos, PI</span></div><span>Piauí · Brasil · Informação e credibilidade</span><a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram do Diário da Notícia">{{ instagram_icon() }} Instagram ↗</a><a href="{{ url_for('admin') }}">Área da redação</a></div></div>
 <header class="masthead wrap">
 <a class="brand" href="{{ url_for('inicio') }}" aria-label="Diário da Notícia — início"><span class="brand-over">DIÁRIO DA</span><strong>NOTÍCIA<span class="brand-dot">.</span></strong><span class="brand-tag">INFORMAÇÃO EM PRIMEIRO LUGAR</span></a>
@@ -1024,6 +1033,9 @@ TEMPLATES = {
     </nav>
   </div>
   <p class="footer-weather-credit">Dados meteorológicos: <a href="https://www.met.no/en" target="_blank" rel="noopener noreferrer">MET Norway</a> (CC BY 4.0). Temperatura prevista, sujeita a alterações.</p>
+  <div class="developer-credit-footer" role="note">
+    <span>Tecnologia desenvolvida por <strong>Reis Tech e Software</strong></span>
+  </div>
 </div>
 </footer>
 <script>
