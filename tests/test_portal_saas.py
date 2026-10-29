@@ -179,6 +179,36 @@ class TestePortaisSaaS(unittest.TestCase):
             anuncio = app.extensions["saas_models"]["anuncio"]
             self.assertTrue(db.session.query(anuncio).first().ativo)
 
+    def test_mensalidade_manual_sem_duplicar_competencia(self):
+        portal_id = self.criar_portal()
+        self.login_master()
+        data = {
+            "_csrf_token": self.token(),
+            "portal_id": str(portal_id),
+            "competencia": "2026-10",
+            "valor": "150,00",
+            "pago": "1",
+        }
+        self.assertEqual(self.cliente.post("/master/mensalidades/salvar", data=data).status_code, 302)
+        with app.app_context():
+            Mensalidade = app.extensions["saas_models"]["mensalidade"]
+            pago = db.session.query(Mensalidade).one()
+            self.assertEqual(pago.valor_centavos, 15000)
+            self.assertIsNotNone(pago.pago_em)
+        data["pago"] = "0"
+        self.assertEqual(self.cliente.post("/master/mensalidades/salvar", data=data).status_code, 302)
+        with app.app_context():
+            Mensalidade = app.extensions["saas_models"]["mensalidade"]
+            self.assertEqual(db.session.query(Mensalidade).count(), 1)
+            self.assertIsNone(db.session.query(Mensalidade).one().pago_em)
+
+    def test_mensalidades_exclusivas_do_master(self):
+        self.criar_portal()
+        self.assertEqual(self.cliente.get("/master/mensalidades").status_code, 302)
+        self.login_cliente("portal-a")
+        self.assertEqual(self.cliente.post("/master/mensalidades/salvar", data={}).status_code, 302)
+        self.assertEqual(self.cliente.get("/master/mensalidades").status_code, 302)
+
     def test_sem_csrf_nao_pode_criar(self):
         self.login_master()
         resposta = self.cliente.post("/master/criar", data={
