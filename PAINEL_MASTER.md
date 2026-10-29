@@ -14,6 +14,9 @@ continua em / e /admin; os sites de clientes usam /p/<slug>/.
 - /p/<slug>/admin — login da redação do cliente
 - /p/<slug>/admin/painel — notícias do cliente
 - /p/<slug>/admin/noticias/nova — publicar notícia
+- /p/<slug>/admin/configuracoes — personalizar logo, cor e slogan
+- /p/<slug>/admin/anuncios — administrar patrocinadores
+- /master/mensalidades — registro manual de mensalidades
 
 ## Recursos deste MVP
 
@@ -22,6 +25,9 @@ continua em / e /admin; os sites de clientes usam /p/<slug>/.
 - Suspensão e reativação do acesso editorial, sem remover notícias públicas.
 - Troca da senha do cliente pelo master, armazenada como hash, não em texto claro.
 - Publicação, edição e exclusão de matérias com imagem via Cloudinary.
+- Logotipo, cor da marca e slogan personalizados por cliente.
+- Patrocinadores e banners independentes, com pausa e exclusão.
+- Controle manual de mensalidades por competência (mês), com registro de pago ou pendente.
 - Isolamento por portal_id em TODAS as leituras e alterações de matérias novas.
 - CSRF em todos os formulários que alteram dados.
 - Compatibilidade com SQLite (desenvolvimento) e PostgreSQL (Render).
@@ -52,7 +58,8 @@ Comando de inicialização:
 
     gunicorn app:app
 
-O banco terá tabelas adicionais saas_portais e saas_noticias. O registro
+O banco terá tabelas adicionais saas_portais, saas_noticias,
+saas_marcas, saas_anuncios e saas_mensalidades. O registro
 dessas tabelas é aditivo, mas **nunca use o banco de produção para testar**.
 
 ## Testes
@@ -65,8 +72,26 @@ GitHub Actions executa esses testes na branch e nos pull requests para main.
 ## Limitações e próximos passos
 
 Esta etapa **não implementa** domínio próprio ativo, checkout/cobrança PIX,
-perfis de vários redatores por portal, patrocinadores por cliente, analytics,
-logo/cor por cliente, nem migração das notícias existentes do Diário.
+perfis de vários redatores por portal, analytics, nem migração das notícias
+existentes do Diário. O registro de mensalidades não movimenta dinheiro e não
+autentica transações; o administrador informa manualmente o status.
 Essas funcionalidades devem ser desenvolvidas e testadas antes da venda
 comercial, com backups, verificação de imagens persistentes e política de
 privacidade/LGPD. Não divulgue como disponíveis recursos ainda não entregues.
+
+## Situação da hospedagem em 29/10/2026
+
+A conta Render tem 21 serviços web + 4 instâncias de Postgres,
+atingindo o limite de 25 serviços do plano Hobby. A tentativa de criar
+`reis-portais-staging-db` foi recusada pelo Render com HTTP 400 e
+`Hobby Tier is limited to 25 services`.
+
+Para publicar o MVP em ambiente independente, precisam existir ao menos
+dois slots: **um para o serviço web e outro para um PostgreSQL**.
+Não remover nem reaproveitar serviços/bancos existentes sem conferir
+uso, backup e autorização explícita.
+
+**Atenção:** o Render reportou para `diario-noticia-db` (o banco atual
+com tabelas `noticias` e `patrocinadores`) expiração do plano grátis
+em 29/10/2026 às 15:59 UTC. Inspecione imediatamente a instância, o backup
+e as opções para evitar indisponibilidade/perda de dados do Diário atual.
