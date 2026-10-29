@@ -2,6 +2,7 @@ from jinja2 import DictLoader
 from flask import Response, Flask, render_template, request, redirect, url_for, session, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
+from sqlalchemy.engine import make_url
 from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
 from functools import wraps
@@ -54,6 +55,12 @@ if database_url:
         database_url = database_url.replace(
             'postgresql://', 'postgresql+psycopg://', 1
         )
+
+# Permite atualizar somente o host do Postgres, sem expor nem substituir
+# a senha existente em DATABASE_URL. Remova o override quando nao precisar.
+database_host_override = os.environ.get('DATABASE_HOST_OVERRIDE', '').strip()
+if database_url and database_host_override:
+    database_url = make_url(database_url).set(host=database_host_override)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     database_url or 'sqlite:///diario.db'
