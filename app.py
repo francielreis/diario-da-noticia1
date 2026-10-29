@@ -820,6 +820,78 @@ PORTAL_CSS = r"""
 @keyframes ad-enter{from{opacity:.4}to{opacity:1}}
 @media(max-width:740px){.topline .wrap{gap:8px;justify-content:space-between}.weather-widget{padding-left:0;border:0}.weather-widget .weather-temp{font-size:15px}.weather-widget .weather-city{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.ad-top [data-slide],.ad-side-rotation [data-slide]{animation:none}}
+
+/* Rodapé editorial profissional - Diário da Notícia */
+.footer{background:#15181e;color:#f6f7fa;margin-top:65px;padding:0 0 22px}
+.footer-accent{height:4px;background:linear-gradient(90deg,#b7192e 0%,#d7354a 40%,#222834 100%)}
+.footer-main{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(135px,.75fr) minmax(180px,1fr);gap:54px;padding:48px 0 42px}
+.footer-brand{color:#fff;max-width:100%}
+.footer-brand .brand-over{font-size:12px;letter-spacing:4px}
+.footer-brand strong{font-size:clamp(31px,3.7vw,46px);letter-spacing:-2.6px;line-height:1.04}
+.footer-tagline{margin:23px 0 18px;font-size:13px;line-height:1.85;color:#abb3c0}
+.footer-editorial{display:inline-flex;align-items:center;gap:5px;color:#b8bec8;font-size:9px;font-weight:700;letter-spacing:1.7px}
+.footer-links,.footer-social{min-width:0}
+.footer-links h2,.footer-social h2{font:700 13px/1.3 Arial,Helvetica,sans-serif;letter-spacing:.4px;color:#fff;margin:7px 0 19px}
+.footer-links a{display:block;width:fit-content;font-size:13px;color:#bac1cd;padding:3px 0;margin:8px 0;transition:color .2s}
+.footer-links a:hover,.footer-bottom a:hover{color:#fff}
+.footer-social p{font-size:13px;color:#b6bdc8;line-height:1.7;margin:0 0 18px}
+.footer-social-link{display:inline-flex;align-items:center;gap:7px;border:1px solid #515968;background:#20242e;color:#fff;border-radius:6px;padding:12px 14px;font-size:12px;font-weight:700;max-width:100%;overflow-wrap:anywhere}
+.footer-social-link .instagram-icon{margin-right:0}
+.footer-social-link:hover{border-color:#e34e63;background:#292f3c}
+.footer-sponsors{border-top:1px solid #343944;padding:35px 0 40px}
+.footer-sponsors-header{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:24px}
+.footer-eyebrow{display:block;color:#ee6274;font-size:10px;font-weight:800;letter-spacing:2px;margin-bottom:10px}
+.footer-sponsors h2{font:700 clamp(21px,3vw,29px)/1.2 Georgia,'Times New Roman',serif;letter-spacing:-.4px;color:#fff;margin:0 0 10px}
+.footer-title-dot{color:#e12a43}
+.footer-sponsors-header p{color:#aeb7c3;font-size:13px;line-height:1.6;margin:0}
+.footer-advertise{white-space:nowrap;border:1px solid #d74053;background:#bb1a30;color:#fff;border-radius:5px;padding:12px 15px;font-size:12px;font-weight:800;text-align:center}
+.footer-advertise:hover{background:#d72b43}
+.footer-sponsor-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.footer-sponsor-card{background:#fff;border:1px solid #414751;border-radius:8px;overflow:hidden;min-width:0;color:#1d2330;transition:transform .2s,box-shadow .2s}
+.footer-sponsor-card:hover{transform:translateY(-3px);box-shadow:0 12px 24px rgba(0,0,0,.19)}
+.footer-sponsor-content{display:block;height:100%;color:inherit}
+.footer-sponsor-image{display:flex;align-items:center;justify-content:center;height:150px;background:#fff;padding:14px}
+.footer-sponsor-image img{width:100%;height:100%;object-fit:contain}
+.footer-sponsor-image span{font-size:15px;font-weight:800;text-align:center}
+.footer-sponsor-caption{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:12px 15px;border-top:1px solid #e9ebef;background:#f7f8fa}
+.footer-sponsor-caption strong{font-size:12px;line-height:1.45;font-weight:800;overflow-wrap:anywhere}
+.footer-sponsor-caption span{flex-shrink:0;color:#ba1828;font-weight:800}
+.footer-swipe-hint{display:none}
+.footer-sponsor-empty{font-size:13px;color:#bfc7d2;border:1px dashed #505866;border-radius:6px;padding:20px}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;border-top:1px solid #343944;margin:0;padding:20px 0 0;color:#9fa8b6;font-size:11px}
+.footer-bottom-links{display:flex;flex-wrap:wrap;gap:14px 24px}
+.footer-bottom-links a{color:#c7ced8;font-size:11px}
+.footer-weather-credit{font-size:10px;line-height:1.6;color:#87909e;margin:14px 0 0}
+.footer-weather-credit a{text-decoration:underline;text-underline-offset:2px}
+@media(max-width:900px){
+ .footer-main{gap:25px;grid-template-columns:1.2fr .8fr;padding:34px 0}
+ .footer-social{grid-column:1/-1}
+ .footer-sponsor-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+ .footer-sponsor-image{height:125px;padding:10px}
+}
+@media(max-width:600px){
+ .footer{margin-top:45px;padding-bottom:24px}
+ .footer-main{grid-template-columns:1fr 1fr;gap:28px 20px;padding:34px 0 31px}
+ .footer-identity{grid-column:1/-1}
+ .footer-brand strong{font-size:42px}
+ .footer-tagline{margin:14px 0;font-size:12px}
+ .footer-links h2,.footer-social h2{margin:0 0 12px}
+ .footer-social{grid-column:auto}
+ .footer-social-link{font-size:11px;padding:9px 10px;gap:4px}
+ .footer-social-link .instagram-icon{width:15px;height:15px}
+ .footer-sponsors{padding:26px 0 27px}
+ .footer-sponsors-header{align-items:flex-start;flex-direction:column;gap:15px}
+ .footer-sponsors-header p{font-size:12px}
+ .footer-advertise{padding:10px 13px}
+ .footer-sponsor-grid{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(215px,76vw);grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;gap:12px;padding:2px 1px 12px;scrollbar-width:thin}
+ .footer-sponsor-card{scroll-snap-align:start}
+ .footer-sponsor-image{height:135px}
+ .footer-swipe-hint{display:block;color:#aab4c0;font-size:11px;text-align:center;margin:9px 0 0}
+ .footer-bottom{gap:14px;padding-top:19px;flex-direction:column;align-items:flex-start}
+ .footer-bottom-links{gap:16px}
+ .footer-weather-credit{margin-top:17px;font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){.footer-sponsor-card{transition:none}}
 """
 
 TEMPLATES = {
@@ -836,8 +908,8 @@ TEMPLATES = {
 <link rel="stylesheet" href="{{ url_for('portal_css') }}">
 {% block meta %}{% endblock %}
 </head>
-<body>
-<a class="skip" href="#conteudo">Ir para o conteúdo</a>
+<body id="topo-pagina">
+<a class="skip" href="#conteudo">Ir para o conteúdo</a>Ir para o conteúdo</a>
 <div class="topline"><div class="wrap"><time>{{ hoje_portal }}</time><div class="weather-widget" aria-label="Previsão do tempo em Picos, PI"><span class="weather-icon" id="weather-icon" aria-hidden="true">🌤️</span><span class="weather-temp" id="weather-temperature">--°C</span><span class="weather-city">Picos, PI</span></div><span>Piauí · Brasil · Informação e credibilidade</span><a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram do Diário da Notícia">{{ instagram_icon() }} Instagram ↗</a><a href="{{ url_for('admin') }}">Área da redação</a></div></div>
 <header class="masthead wrap">
 <a class="brand" href="{{ url_for('inicio') }}" aria-label="Diário da Notícia — início"><span class="brand-over">DIÁRIO DA</span><strong>NOTÍCIA<span class="brand-dot">.</span></strong><span class="brand-tag">INFORMAÇÃO EM PRIMEIRO LUGAR</span></a>
@@ -846,10 +918,68 @@ TEMPLATES = {
 </header>
 <nav class="nav" aria-label="Editorias"><div class="wrap nav-inner"><a href="{{ url_for('inicio') }}" {% if not categoria_atual|default('') %}class="active"{% endif %}>Início</a>{% for cat in categorias %}<a href="{{ url_for('inicio',categoria=cat) }}" {% if categoria_atual|default('') == cat %}class="active" aria-current="page"{% endif %}>{{ cat }}</a>{% endfor %}</div></nav>
 <main id="conteudo" class="wrap">{% block content %}{% endblock %}</main>
-<footer class="footer" id="patrocinadores"><div class="wrap">
-<div class="footer-head"><a class="brand brand-footer" href="{{ url_for('inicio') }}"><span class="brand-over">DIÁRIO DA</span><strong>NOTÍCIA<span class="brand-dot">.</span></strong></a><p>O Piauí e a região em pauta.<br>Informação e credibilidade, todos os dias.</p></div>
-{% if patrocinadores %}<h2>Nossos patrocinadores</h2><div class="partner-grid">{% for p in patrocinadores %}<div class="partner">{% if p.link %}<a href="{{ p.link }}" target="_blank" rel="noopener noreferrer sponsored">{% endif %}{% if p.imagem %}<img src="{{ p.imagem }}" alt="{{ p.nome }}" loading="lazy">{% endif %}<strong>{{ p.nome }}</strong>{% if p.link %}</a>{% endif %}</div>{% endfor %}</div>{% endif %}
-<p style="font-size:10px;color:#b8bdc5;margin-top:22px">Temperatura prevista: <a href="https://www.met.no/en" target="_blank" rel="noopener noreferrer">MET Norway</a> (CC BY 4.0). Estimativa meteorológica.</p><div class="footer-bottom"><span>© {{ ano_portal }} Diário da Notícia</span><a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">{{ instagram_icon() }} Siga @diari_odanoticia no Instagram ↗</a><a href="{{ url_for('admin') }}">Painel da redação</a><a href="#conteudo">Voltar ao topo ↑</a></div></div></footer>
+<footer class="footer" id="patrocinadores">
+<div class="footer-accent" aria-hidden="true"></div>
+<div class="wrap">
+  <div class="footer-main">
+    <section class="footer-identity" aria-label="Sobre o Diário da Notícia">
+      <a class="brand footer-brand" href="{{ url_for('inicio') }}" aria-label="Diário da Notícia, página inicial">
+        <span class="brand-over">DIÁRIO DA</span>
+        <strong>NOTÍCIA<span class="brand-dot">.</span></strong>
+      </a>
+      <p class="footer-tagline">O Piauí e a região em pauta.<br>Informação e credibilidade, todos os dias.</p>
+      <span class="footer-editorial"><span class="live-dot" aria-hidden="true"></span> INFORMAÇÃO REGIONAL</span>
+    </section>
+    <nav class="footer-links" aria-label="Acesso rápido">
+      <h2>Explore o portal</h2>
+      <a href="{{ url_for('inicio') }}">Página inicial</a>
+      <a href="{{ url_for('inicio',categoria='Piauí') }}">Piauí</a>
+      <a href="{{ url_for('inicio',categoria='Política') }}">Política</a>
+      <a href="{{ url_for('inicio',categoria='Cidades') }}">Cidades</a>
+      <a href="{{ url_for('inicio',categoria='Esportes') }}">Esportes</a>
+    </nav>
+    <section class="footer-social" aria-label="Redes sociais">
+      <h2>Conecte-se</h2>
+      <p>Acompanhe as atualizações e fale com a nossa equipe pelo Instagram.</p>
+      <a class="footer-social-link" href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">{{ instagram_icon() }} @diari_odanoticia <span aria-hidden="true">↗</span></a>
+    </section>
+  </div>
+  <section class="footer-sponsors" aria-labelledby="footer-sponsors-title">
+    <div class="footer-sponsors-header">
+      <div><span class="footer-eyebrow">PARCEIROS DO PORTAL</span>
+        <h2 id="footer-sponsors-title">Nossos patrocinadores<span class="footer-title-dot">.</span></h2>
+        <p>Empresas que valorizam a informação regional.</p>
+      </div>
+      <a class="footer-advertise" href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">Anuncie sua marca <span aria-hidden="true">↗</span></a>
+    </div>
+    {% if patrocinadores %}
+    <div class="footer-sponsor-grid">
+      {% for p in patrocinadores %}
+      <article class="footer-sponsor-card">
+        {% if p.link %}<a class="footer-sponsor-content" href="{{ p.link }}" target="_blank" rel="noopener noreferrer sponsored" aria-label="Visitar {{ p.nome }}">{% else %}<div class="footer-sponsor-content">{% endif %}
+          <div class="footer-sponsor-image">
+            {% if p.imagem %}<img src="{{ p.imagem }}" alt="Publicidade de {{ p.nome }}" loading="lazy">{% else %}<span>{{ p.nome }}</span>{% endif %}
+          </div>
+          <div class="footer-sponsor-caption"><strong>{{ p.nome }}</strong>{% if p.link %}<span aria-hidden="true">↗</span>{% endif %}</div>
+        {% if p.link %}</a>{% else %}</div>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    <p class="footer-swipe-hint">Deslize para conhecer nossos parceiros <span aria-hidden="true">→</span></p>
+    {% else %}
+    <p class="footer-sponsor-empty">Sua empresa pode fazer parte deste espaço. Entre em contato para anunciar.</p>
+    {% endif %}
+  </section>
+  <div class="footer-bottom">
+    <span>© {{ ano_portal }} Diário da Notícia · Todos os direitos reservados.</span>
+    <nav class="footer-bottom-links" aria-label="Acessos do rodapé">
+      <a href="{{ url_for('admin') }}">Painel da redação</a>
+      <a href="#topo-pagina">↑ Voltar ao topo</a>
+    </nav>
+  </div>
+  <p class="footer-weather-credit">Dados meteorológicos: <a href="https://www.met.no/en" target="_blank" rel="noopener noreferrer">MET Norway</a> (CC BY 4.0). Temperatura prevista, sujeita a alterações.</p>
+</div>
+</footer>
 <script>
 document.querySelectorAll('[data-carousel]').forEach(function(area){
  const slides=Array.from(area.querySelectorAll('[data-slide]'));
