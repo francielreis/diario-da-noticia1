@@ -909,7 +909,7 @@ TEMPLATES = {
 {% block meta %}{% endblock %}
 </head>
 <body id="topo-pagina">
-<a class="skip" href="#conteudo">Ir para o conteúdo</a>Ir para o conteúdo</a>
+<a class="skip" href="#conteudo">Ir para o conteúdo</a>
 <div class="topline"><div class="wrap"><time>{{ hoje_portal }}</time><div class="weather-widget" aria-label="Previsão do tempo em Picos, PI"><span class="weather-icon" id="weather-icon" aria-hidden="true">🌤️</span><span class="weather-temp" id="weather-temperature">--°C</span><span class="weather-city">Picos, PI</span></div><span>Piauí · Brasil · Informação e credibilidade</span><a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram do Diário da Notícia">{{ instagram_icon() }} Instagram ↗</a><a href="{{ url_for('admin') }}">Área da redação</a></div></div>
 <header class="masthead wrap">
 <a class="brand" href="{{ url_for('inicio') }}" aria-label="Diário da Notícia — início"><span class="brand-over">DIÁRIO DA</span><strong>NOTÍCIA<span class="brand-dot">.</span></strong><span class="brand-tag">INFORMAÇÃO EM PRIMEIRO LUGAR</span></a>
