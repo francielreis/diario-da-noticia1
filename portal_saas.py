@@ -76,7 +76,7 @@ MASTER_LOGIN = r"""
 
 MASTER_PAINEL = r"""
 <div class="row" style="justify-content:space-between"><h1>Painel Master</h1>
-<a class="btn secondary" href="{{ url_for('saas_master_sair') }}">Sair</a></div>
+<div class="row"><a class="btn secondary" href="{{ url_for('saas_master_mensalidades') }}">Mensalidades</a><a class="btn secondary" href="{{ url_for('saas_master_sair') }}">Sair</a></div></div>
 <p>Cadastre clientes e controle os acessos. Os portais ficam separados do Diário da Notícia original.</p>
 <div class="cols">
 <div class="card"><h2>{{ portais|length }}</h2><p>Portais cadastrados</p></div>
@@ -500,3 +500,6 @@ def register_portals(app, db, templates, csrf_token, exigir_csrf, salvar_imagem)
     from portal_saas_extras import register_extras
     register_extras(app, db, PortalCliente, cliente_required,
                     portal_por_slug, exigir_csrf, salvar_imagem, pagina)
+
+    from portal_saas_finance import register_finance
+    register_finance(app, db, PortalCliente, master_required, exigir_csrf, pagina)
