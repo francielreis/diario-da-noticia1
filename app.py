@@ -1028,6 +1028,25 @@ TEMPLATES = {
 <title>{% block title %}Diário da Notícia | Piauí e região{% endblock %}</title>
 <meta name="description" content="{% block description %}Notícias do Piauí, das cidades e do Brasil. Informação e credibilidade no Diário da Notícia.{% endblock %}">
 <meta name="theme-color" content="#ba1828">
+<meta property="og:locale" content="pt_BR">
+{% if request.endpoint == 'inicio' %}
+<link rel="canonical" href="https://diario-da-noticia1.onrender.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Diário da Notícia">
+<meta property="og:title" content="Diário da Notícia | Notícias do Piauí e Região">
+<meta property="og:description" content="Notícias do Piauí, de Picos e da região. Informação com credibilidade no Diário da Notícia.">
+<meta property="og:url" content="https://diario-da-noticia1.onrender.com/">
+<meta property="og:image" content="https://res.cloudinary.com/vfb51pce/image/upload/c_pad,w_1200,h_630,b_rgb:ffffff/v1791382162/diario-da-noticia/meqhpk6wlchcqifsyx94.png">
+<meta property="og:image:secure_url" content="https://res.cloudinary.com/vfb51pce/image/upload/c_pad,w_1200,h_630,b_rgb:ffffff/v1791382162/diario-da-noticia/meqhpk6wlchcqifsyx94.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Identidade visual do Diário da Notícia, portal de notícias do Piauí">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Diário da Notícia | Notícias do Piauí e Região">
+<meta name="twitter:description" content="Notícias do Piauí, de Picos e da região. Informação com credibilidade no Diário da Notícia.">
+<meta name="twitter:image" content="https://res.cloudinary.com/vfb51pce/image/upload/c_pad,w_1200,h_630,b_rgb:ffffff/v1791382162/diario-da-noticia/meqhpk6wlchcqifsyx94.png">
+{% endif %}
 <link rel="stylesheet" href="{{ url_for('portal_css') }}">
 {% block meta %}{% endblock %}
 </head>
@@ -1319,7 +1338,17 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
 <meta property="og:type" content="article">
 <meta property="og:url" content="{{ url_for('noticia',id=noticia.id,_external=true) }}">
 <meta property="og:site_name" content="Diário da Notícia">
-{% if noticia.imagem %}<meta property="og:image" content="{{ noticia.imagem }}">{% endif %}
+{% if noticia.imagem %}
+<meta property="og:image" content="{{ noticia.imagem }}">
+<meta name="twitter:image" content="{{ noticia.imagem }}">
+{% else %}
+<meta property="og:image" content="https://res.cloudinary.com/vfb51pce/image/upload/c_pad,w_1200,h_630,b_rgb:ffffff/v1791382162/diario-da-noticia/meqhpk6wlchcqifsyx94.png">
+<meta name="twitter:image" content="https://res.cloudinary.com/vfb51pce/image/upload/c_pad,w_1200,h_630,b_rgb:ffffff/v1791382162/diario-da-noticia/meqhpk6wlchcqifsyx94.png">
+{% endif %}
+<meta property="og:image:alt" content="{{ noticia.titulo if noticia.imagem else 'Diário da Notícia, portal de notícias do Piauí' }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ noticia.titulo }}">
+<meta name="twitter:description" content="{{ (noticia.resumo or noticia.titulo)|truncate(180) }}">
 {% endblock %}
 {% block content %}
 {{ ads_top(patrocinadores) }}
