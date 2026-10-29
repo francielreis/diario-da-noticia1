@@ -850,7 +850,12 @@ PORTAL_CSS = r"""
 .footer-sponsor-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .footer-sponsor-card{background:#fff;border:1px solid #e1e4ea;border-radius:8px;overflow:hidden;min-width:0;color:#1d2330;transition:transform .2s,box-shadow .2s}
 .footer-sponsor-card:hover{transform:translateY(-3px);box-shadow:0 12px 24px rgba(0,0,0,.19)}
-.footer-sponsor-content{display:block;height:100%;color:inherit}
+.footer-sponsor-content{display:block;flex:1;color:inherit}
+.footer-sponsor-card{display:flex;flex-direction:column}
+.footer-sponsor-linkbox{display:flex;flex-direction:column;gap:9px;padding:12px 10px;border-top:1px solid #e8ebf0}
+.footer-sponsor-url{font-size:11px;color:#4c617c;overflow-wrap:anywhere;text-decoration:underline}
+.footer-sponsor-visit{display:block;background:#bd1d32;border-radius:5px;color:#fff;font-size:11px;font-weight:800;padding:10px 6px;text-align:center}
+.footer-sponsor-visit:hover{background:#941629;color:white}
 .footer-sponsor-image{display:flex;align-items:center;justify-content:center;height:150px;background:#fff;padding:14px}
 .footer-sponsor-image img{width:100%;height:100%;object-fit:contain}
 .footer-sponsor-image span{font-size:15px;font-weight:800;text-align:center}
@@ -967,6 +972,12 @@ TEMPLATES = {
           </div>
           <div class="footer-sponsor-caption"><strong>{{ p.nome }}</strong>{% if p.link %}<span aria-hidden="true">↗</span>{% endif %}</div>
         {% if p.link %}</a>{% else %}</div>{% endif %}
+        {% if p.link %}
+        <div class="footer-sponsor-linkbox">
+          <a class="footer-sponsor-url" href="{{ p.link }}" target="_blank" rel="noopener noreferrer sponsored" title="{{ p.link }}">{{ p.link|replace('https://','')|replace('http://','')|truncate(37,True,'…') }}</a>
+          <a class="footer-sponsor-visit" href="{{ p.link }}" target="_blank" rel="noopener noreferrer sponsored">Acessar link ↗</a>
+        </div>
+        {% endif %}
       </article>
       {% endfor %}
       </div>
