@@ -27,8 +27,8 @@ BASE_INICIO = r"""<!doctype html>
 <meta name="robots" content="{{ 'noindex,nofollow' if privado else 'index,follow' }}">
 <title>{{ titulo }} · Reis Tech e Software</title>
 <style>
-:root{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#1b2230;background:#f5f7fa}
-*{box-sizing:border-box}body{margin:0}a{color:#1455a2;text-decoration:none}
+:root{--accent:{{ marca.cor if marca else '#1455a2' }};font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#1b2230;background:#f5f7fa}
+*{box-sizing:border-box}body{margin:0}a{color:var(--accent);text-decoration:none}
 header{background:#111b2e;color:#fff;padding:16px 0}
 header a{color:white}.wrap{width:min(1080px,calc(100% - 32px));margin:auto}
 .top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
@@ -41,7 +41,7 @@ th,td{border-bottom:1px solid #e3e8f0;padding:13px 10px;text-align:left;vertical
 .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
 label{display:block;font-weight:600;margin:13px 0 5px}input,select,textarea{
 font:inherit;width:100%;max-width:100%;padding:11px;border:1px solid #c7d0dc;border-radius:7px}
-textarea{min-height:130px}button,.btn{display:inline-block;font:inherit;background:#1455a2;
+textarea{min-height:130px}button,.btn{display:inline-block;font:inherit;background:var(--accent);
 color:white;border:none;border-radius:7px;padding:10px 15px;cursor:pointer}
 .btn.secondary,button.secondary{background:#e4ebf4;color:#1c324d}
 button.danger{background:#a32929}.inline{display:inline}
@@ -55,7 +55,7 @@ footer{border-top:1px solid #e3e8f0;padding:23px 0;color:#637080;font-size:13px}
 @media(max-width:600px){th,td{padding:9px 6px;font-size:13px}.card{padding:16px}}
 </style></head><body>
 <header><div class="wrap top">
-<strong>Reis Tech e Software</strong>
+{% if portal and not privado %}<div class="row">{% if marca and marca.logo %}<img src="{{ marca.logo }}" alt="Logotipo de {{ portal.nome }}" style="height:50px;max-width:145px;object-fit:contain">{% endif %}<strong>{{ portal.nome }}</strong></div>{% else %}<strong>Reis Tech e Software</strong>{% endif %}
 <nav><a href="{{ url_for('saas_master') if privado and modo_master else (url_for('saas_portal',slug=portal.slug) if portal else '/') }}">Início</a></nav>
 </div></header><main class="wrap">
 {% for msg in get_flashed_messages() %}<div class="notice" role="status">{{ msg }}</div>{% endfor %}
@@ -136,6 +136,8 @@ CLIENTE_PAINEL = r"""
 <div class="row">
 <a class="btn" href="{{ url_for('saas_cliente_nova',slug=portal.slug) }}">+ Publicar notícia</a>
 <a class="btn secondary" href="{{ url_for('saas_portal',slug=portal.slug) }}" target="_blank" rel="noopener">Ver meu portal</a>
+<a class="btn secondary" href="{{ url_for('saas_cliente_config',slug=portal.slug) }}">Personalizar</a>
+<a class="btn secondary" href="{{ url_for('saas_cliente_anuncios',slug=portal.slug) }}">Patrocinadores</a>
 </div><div class="card"><h2>Notícias ({{ noticias|length }})</h2>
 <div class="table-scroll"><table><thead><tr><th>Título</th><th>Categoria</th><th>Ações</th></tr></thead><tbody>
 {% for n in noticias %}<tr><td>{{ n.titulo }}</td><td>{{ n.categoria }}</td>
@@ -166,7 +168,7 @@ NOTICIA_EDITOR = r"""
 
 PORTAL_HOME = r"""
 <div class="row" style="justify-content:space-between">
-<div><h1>{{ portal.nome }}</h1><p class="muted">Notícias e informação da região</p></div></div>
+<div><h1>{{ portal.nome }}</h1><p class="muted">{{ marca.slogan if marca else 'Notícias e informação da região' }}</p></div></div>
 <div class="cols">
 {% for n in noticias %}
 <article class="card">
@@ -176,6 +178,11 @@ PORTAL_HOME = r"""
 <p>{{ n.resumo }}</p></article>
 {% else %}<div class="card"><p>Este portal ainda não publicou notícias.</p></div>{% endfor %}
 </div>
+{% if anuncios %}<section class="card"><h2>Publicidade</h2><div class="cols">
+{% for a in anuncios %}<div>{% if a.link %}<a href="{{ a.link }}" target="_blank" rel="noopener noreferrer sponsored nofollow">{% endif %}
+<img class="news-image" src="{{ a.imagem }}" alt="Publicidade: {{ a.titulo }}" loading="lazy">
+{% if a.link %}</a>{% endif %}<p><small>{{ a.titulo }}</small></p></div>{% endfor %}
+</div></section>{% endif %}
 """
 
 NOTICIA_PUBLICA = r"""
@@ -227,9 +234,11 @@ def register_portals(app, db, templates, csrf_token, exigir_csrf, salvar_imagem)
     }
 
     def pagina(conteudo, *, titulo, portal=None, privado=False, modo_master=False, **kwargs):
+        obter_marca = app.extensions.get("saas_obter_marca")
+        marca = obter_marca(portal.id) if obter_marca and portal else None
         return render_template_string(
             BASE_INICIO + conteudo + BASE_FIM, titulo=titulo, portal=portal,
-            privado=privado, modo_master=modo_master,
+            marca=marca, privado=privado, modo_master=modo_master,
             csrf_token=csrf_token, **kwargs
         )
 
@@ -363,7 +372,10 @@ def register_portals(app, db, templates, csrf_token, exigir_csrf, salvar_imagem)
             .order_by(NoticiaCliente.criado_em.desc(), NoticiaCliente.id.desc())
             .limit(50)
         ).all()
-        return pagina(PORTAL_HOME, titulo=portal.nome, portal=portal, noticias=noticias)
+        obter_anuncios = app.extensions.get("saas_obter_anuncios")
+        anuncios = obter_anuncios(portal.id) if obter_anuncios else []
+        return pagina(PORTAL_HOME, titulo=portal.nome, portal=portal,
+                      noticias=noticias, anuncios=anuncios)
 
     @app.route("/p/<slug>/noticia/<int:noticia_id>")
     def saas_noticia(slug, noticia_id):
@@ -483,3 +495,8 @@ def register_portals(app, db, templates, csrf_token, exigir_csrf, salvar_imagem)
         portal_por_slug(slug)
         session.clear()
         return redirect(url_for("saas_cliente_login", slug=slug))
+
+    # Extensões isoladas: marca e publicidade por cliente.
+    from portal_saas_extras import register_extras
+    register_extras(app, db, PortalCliente, cliente_required,
+                    portal_por_slug, exigir_csrf, salvar_imagem, pagina)
