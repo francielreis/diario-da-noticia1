@@ -1,5 +1,5 @@
 from jinja2 import DictLoader
-from flask import Response, Flask, render_template, request, redirect, url_for, session, abort
+from flask import Response, Flask, render_template, request, redirect, url_for, session, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
 from datetime import datetime, timezone, timedelta
@@ -11,6 +11,10 @@ import cloudinary.uploader
 import hmac
 import os
 import secrets
+import json
+import time
+from threading import Lock
+from urllib.request import Request, urlopen
 
 app = Flask(__name__)
 
@@ -753,6 +757,47 @@ def erro_500(error):
     )
 
 
+
+# Dados meteorológicos de Picos (PI) – MET Norway, CC BY 4.0.
+_clima_cache = {'expira_em': 0, 'dados': None}
+_clima_lock = Lock()
+
+
+@app.route('/api/tempo')
+def api_tempo():
+    with _clima_lock:
+        if _clima_cache['dados'] and time.monotonic() < _clima_cache['expira_em']:
+            return jsonify(_clima_cache['dados'])
+        request_clima = Request(
+            'https://api.met.no/weatherapi/locationforecast/2.0/compact'
+            '?lat=-7.0769&lon=-41.4669',
+            headers={
+                'User-Agent': 'DiarioDaNoticia/1.0 (https://github.com/francielreis/diario-da-noticia1)',
+                'Accept': 'application/json'
+            }
+        )
+        try:
+            with urlopen(request_clima, timeout=6) as resposta:
+                previsao = json.load(resposta)
+            periodo = previsao['properties']['timeseries'][0]
+            dados_tempo = periodo['data']
+            proximas = dados_tempo.get('next_1_hours') or dados_tempo.get('next_6_hours') or {}
+            temperatura = float(dados_tempo['instant']['details']['air_temperature'])
+            clima = {
+                'cidade': 'Picos, PI',
+                'temperatura': round(temperatura),
+                'condicao': proximas.get('summary', {}).get('symbol_code', ''),
+                'previsto_para': periodo.get('time')
+            }
+            _clima_cache.update({'dados': clima, 'expira_em': time.monotonic() + 1200})
+            return jsonify(clima)
+        except (OSError, ValueError, KeyError, IndexError, TypeError) as erro:
+            app.logger.warning('Clima indisponível: %s', erro)
+            if _clima_cache['dados']:
+                return jsonify(_clima_cache['dados'])
+            return jsonify({'erro': 'Temperatura indisponível'}), 503
+
+
 # Visual e páginas incluídos neste arquivo.
 
 PORTAL_CSS = r"""
@@ -762,6 +807,19 @@ PORTAL_CSS = r"""
 @media(max-width:1000px){.masthead{grid-template-columns:280px 1fr;gap:25px}.redacao{display:none}.hero-grid{grid-template-columns:1.5fr 1fr}.hero-secondary{grid-column:1/-1}.content-columns{grid-template-columns:minmax(0,1fr) 240px;gap:25px}.news-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:740px){.wrap{width:calc(100% - 32px)}.topline .wrap>span{display:none}.topline{font-size:10px}.masthead{grid-template-columns:1fr;gap:24px;padding:25px 0}.brand{align-self:start}.brand strong{font-size:44px}.brand-over{font-size:14px}.search{height:42px}.nav a{padding:14px 13px;font-size:11px}.ad-top{margin:20px auto}.ad img{height:auto;max-height:170px;min-height:65px;object-fit:contain}.headline{margin:25px auto}.headline h1{letter-spacing:-.6px}.headline p{font-size:14px}.hero-grid{grid-template-columns:1fr;gap:20px}.hero-list{border-left:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:14px}.hero-list h2{font-size:15px}.content-columns{display:block}.section-heading h2{font-size:22px}.news-grid{gap:18px}.news-card h3{font-size:16px}.news-card p{font-size:12px}.section-grid{grid-template-columns:1fr}.section-list{display:grid;grid-template-columns:1fr 1fr;gap:18px}.compact>a,.news-card.compact>a{grid-template-columns:1fr;gap:9px}.compact .news-photo{height:100px}.sidebar .latest-list{grid-template-columns:1fr 1fr}.sidebar .ad img{max-height:260px}.partner-grid{grid-template-columns:repeat(2,1fr)}.footer-head{align-items:start;flex-direction:column;gap:20px}.footer-bottom{flex-wrap:wrap}.article-head .summary{font-size:17px}.article-text{font-size:17px;line-height:1.85}.related-grid{grid-template-columns:1fr 1fr}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Clima e publicidade rotativa */
+.topline .wrap{align-items:center;flex-wrap:wrap;row-gap:8px}
+.weather-widget{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:var(--ink);border-left:1px solid var(--line);padding-left:12px}
+.weather-widget .weather-icon{font-size:20px}
+.weather-widget .weather-temp{font-size:16px;font-weight:800}
+.weather-widget .weather-city{font-size:10px;color:var(--muted)}
+.ad-top [data-slide],.ad-side-rotation [data-slide]{animation:ad-enter .4s ease both}
+.ad-side-rotation{margin-bottom:25px}.ad-side-rotation .ad{margin:0}
+.ad-controls button{min-width:33px;min-height:30px;border-radius:4px}
+@keyframes ad-enter{from{opacity:.4}to{opacity:1}}
+@media(max-width:740px){.topline .wrap{gap:8px;justify-content:space-between}.weather-widget{padding-left:0;border:0}.weather-widget .weather-temp{font-size:15px}.weather-widget .weather-city{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.ad-top [data-slide],.ad-side-rotation [data-slide]{animation:none}}
 """
 
 TEMPLATES = {
@@ -780,7 +838,7 @@ TEMPLATES = {
 </head>
 <body>
 <a class="skip" href="#conteudo">Ir para o conteúdo</a>
-<div class="topline"><div class="wrap"><time>{{ hoje_portal }}</time><span>Piauí · Brasil · Informação e credibilidade</span><a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram do Diário da Notícia">{{ instagram_icon() }} Instagram ↗</a><a href="{{ url_for('admin') }}">Área da redação</a></div></div>
+<div class="topline"><div class="wrap"><time>{{ hoje_portal }}</time><div class="weather-widget" aria-label="Previsão do tempo em Picos, PI"><span class="weather-icon" id="weather-icon" aria-hidden="true">🌤️</span><span class="weather-temp" id="weather-temperature">--°C</span><span class="weather-city">Picos, PI</span></div><span>Piauí · Brasil · Informação e credibilidade</span><a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram do Diário da Notícia">{{ instagram_icon() }} Instagram ↗</a><a href="{{ url_for('admin') }}">Área da redação</a></div></div>
 <header class="masthead wrap">
 <a class="brand" href="{{ url_for('inicio') }}" aria-label="Diário da Notícia — início"><span class="brand-over">DIÁRIO DA</span><strong>NOTÍCIA<span class="brand-dot">.</span></strong><span class="brand-tag">INFORMAÇÃO EM PRIMEIRO LUGAR</span></a>
 <form class="search" action="{{ url_for('inicio') }}" method="get" role="search"><label class="sr-only" for="busca-portal">Buscar notícias</label><input id="busca-portal" type="search" name="q" value="{{ busca|default('') }}" placeholder="O que você quer saber?" maxlength="200"><button type="submit">Buscar <span aria-hidden="true">↗</span></button></form>
@@ -791,7 +849,7 @@ TEMPLATES = {
 <footer class="footer" id="patrocinadores"><div class="wrap">
 <div class="footer-head"><a class="brand brand-footer" href="{{ url_for('inicio') }}"><span class="brand-over">DIÁRIO DA</span><strong>NOTÍCIA<span class="brand-dot">.</span></strong></a><p>O Piauí e a região em pauta.<br>Informação e credibilidade, todos os dias.</p></div>
 {% if patrocinadores %}<h2>Nossos patrocinadores</h2><div class="partner-grid">{% for p in patrocinadores %}<div class="partner">{% if p.link %}<a href="{{ p.link }}" target="_blank" rel="noopener noreferrer sponsored">{% endif %}{% if p.imagem %}<img src="{{ p.imagem }}" alt="{{ p.nome }}" loading="lazy">{% endif %}<strong>{{ p.nome }}</strong>{% if p.link %}</a>{% endif %}</div>{% endfor %}</div>{% endif %}
-<div class="footer-bottom"><span>© {{ ano_portal }} Diário da Notícia</span><a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">{{ instagram_icon() }} Siga @diari_odanoticia no Instagram ↗</a><a href="{{ url_for('admin') }}">Painel da redação</a><a href="#conteudo">Voltar ao topo ↑</a></div></div></footer>
+<p style="font-size:10px;color:#b8bdc5;margin-top:22px">Temperatura prevista: <a href="https://www.met.no/en" target="_blank" rel="noopener noreferrer">MET Norway</a> (CC BY 4.0). Estimativa meteorológica.</p><div class="footer-bottom"><span>© {{ ano_portal }} Diário da Notícia</span><a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">{{ instagram_icon() }} Siga @diari_odanoticia no Instagram ↗</a><a href="{{ url_for('admin') }}">Painel da redação</a><a href="#conteudo">Voltar ao topo ↑</a></div></div></footer>
 <script>
 document.querySelectorAll('[data-carousel]').forEach(function(area){
  const slides=Array.from(area.querySelectorAll('[data-slide]'));
@@ -805,7 +863,43 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
  }
  area.querySelector('[data-prev]').addEventListener('click',()=>show(index-1));
  area.querySelector('[data-next]').addEventListener('click',()=>show(index+1));
+ let paused=false;
+ area.addEventListener('mouseenter',()=>paused=true);
+ area.addEventListener('mouseleave',()=>paused=false);
+ area.addEventListener('focusin',()=>paused=true);
+ area.addEventListener('focusout',()=>paused=area.contains(document.activeElement));
+ const reducedMotion=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(!reducedMotion)window.setInterval(function(){
+   if(!paused && !document.hidden)show(index+1);
+ },area.classList.contains('ad-side-rotation')?6500:5000);
 });
+</script>
+<script>
+(function(){
+ const temperature=document.getElementById('weather-temperature');
+ const icon=document.getElementById('weather-icon');
+ if(!temperature)return;
+ async function updateWeather(){
+  try{
+   const response=await fetch('/api/tempo',{cache:'no-store'});
+   if(!response.ok)throw Error('Clima indisponível');
+   const data=await response.json();
+   if(!Number.isFinite(data.temperatura))throw Error('Dados inválidos');
+   const symbol=(data.condicao||'').toLowerCase();
+   let emoji='🌤️';
+   if(symbol.includes('thunder'))emoji='⛈️';
+   else if(symbol.includes('rain')||symbol.includes('sleet'))emoji='🌧️';
+   else if(symbol.includes('snow'))emoji='❄️';
+   else if(symbol.includes('fog'))emoji='🌫️';
+   else if(symbol.includes('cloud'))emoji='☁️';
+   else if(symbol.includes('clearsky'))emoji='☀️';
+   temperature.textContent=Math.round(data.temperatura)+'°C';
+   icon.textContent=emoji;
+  }catch(error){temperature.title='Previsão indisponível no momento';}
+ }
+ updateWeather();
+ window.setInterval(updateWeather,900000);
+})();
 </script>
 {% block scripts %}{% endblock %}
 </body></html>
@@ -824,6 +918,9 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
 {% macro ad(p, lateral=false) -%}
 <div class="ad {% if lateral %}ad-side{% endif %}"><span class="ad-label">Publicidade</span>{% if p.link %}<a href="{{ p.link }}" target="_blank" rel="noopener noreferrer sponsored">{% endif %}{% if p.imagem %}<img src="{{ p.imagem }}" alt="{{ p.nome }}" loading="lazy">{% else %}<div class="ad-name">{{ p.nome }}</div>{% endif %}{% if p.link %}</a>{% endif %}</div>
 {%- endmacro %}
+{% macro ads_side(items) -%}
+{% if items %}<div class="ad-side-rotation" data-carousel aria-label="Anúncios rotativos laterais">{% for p in items %}<div data-slide {% if not loop.first %}hidden{% endif %}>{{ ad(p,true) }}</div>{% endfor %}{% if items|length>1 %}<div class="ad-controls"><button type="button" data-prev aria-label="Patrocinador anterior">←</button><span data-count>1 / {{ items|length }}</span><button type="button" data-next aria-label="Próximo patrocinador">→</button></div>{% endif %}</div>{% endif %}
+{%- endmacro %}
 {% macro ads_top(items) -%}
 {% if items %}<section class="ad-top" data-carousel aria-label="Anúncios dos patrocinadores">{% for p in items %}<div data-slide {% if not loop.first %}hidden{% endif %}>{{ ad(p) }}</div>{% endfor %}{% if items|length>1 %}<div class="ad-controls"><button type="button" data-prev aria-label="Anúncio anterior">←</button><span data-count>1 / {{ items|length }}</span><button type="button" data-next aria-label="Próximo anúncio">→</button></div>{% endif %}</section>{% endif %}
 {%- endmacro %}
@@ -831,7 +928,7 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
 
     'index.html': r"""
 {% extends 'portal_base.html' %}
-{% from 'portal_macros.html' import photo, card, ad, ads_top %}
+{% from 'portal_macros.html' import photo, card, ad, ads_top, ads_side %}
 {% block title %}{% if busca %}Busca: {{ busca }}{% elif categoria_atual %}{{ categoria_atual }}{% else %}Diário da Notícia{% endif %} | Notícias do Piauí{% endblock %}
 {% block content %}
 {{ ads_top(patrocinadores) }}
@@ -852,7 +949,7 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
 {% if paginacao.pages>1 %}<nav class="pagination" aria-label="Páginas de notícias">{% if paginacao.has_prev %}<a href="{{ url_for('inicio',page=paginacao.prev_num,categoria=categoria_atual,q=busca) }}">← Anterior</a>{% endif %}{% for page in paginacao.iter_pages() %}{% if page %}{% if page==paginacao.page %}<span class="current" aria-current="page">{{ page }}</span>{% else %}<a href="{{ url_for('inicio',page=page,categoria=categoria_atual,q=busca) }}">{{ page }}</a>{% endif %}{% else %}<span>…</span>{% endif %}{% endfor %}{% if paginacao.has_next %}<a href="{{ url_for('inicio',page=paginacao.next_num,categoria=categoria_atual,q=busca) }}">Próxima →</a>{% endif %}</nav>{% endif %}
 {% for secao in secoes %}<section><div class="section-heading"><h2>{{ secao.nome }}</h2><a href="{{ url_for('inicio',categoria=secao.nome) }}">Ver todas ↗</a></div><div class="section-grid">{% set n=secao.noticias[0] %}<article class="lead-story"><a href="{{ url_for('noticia',id=n.id) }}">{{ photo(n) }}<h2>{{ n.titulo }}</h2></a><time>{{ n.data_publicacao|data_br }}</time></article><div class="section-list">{% for n in secao.noticias[1:] %}{{ card(n,true) }}{% endfor %}</div></div></section>{% if patrocinadores and loop.index%2==0 %}<div class="inline-ad">{{ ad(patrocinadores[((loop.index//2)-1) % (patrocinadores|length)]) }}</div>{% endif %}{% endfor %}
 </div><aside class="sidebar" aria-label="Mais notícias e patrocinadores">
-{% if patrocinadores %}<h2 class="side-title">Patrocinadores</h2>{% for p in patrocinadores %}{{ ad(p,true) }}{% endfor %}{% endif %}
+{% if patrocinadores %}<h2 class="side-title">Patrocinadores</h2>{{ ads_side(patrocinadores) }}{% endif %}
 {% if ultimas %}<h2 class="side-title">Mais recentes</h2><div class="latest-list">{% for n in ultimas %}{{ card(n,true) }}{% endfor %}</div>{% endif %}
 <div class="newsletter"><h3>Notícias da sua região</h3><p>Acompanhe as informações do Piauí e das cidades.</p><a href="{{ url_for('inicio',categoria='Cidades') }}">Acompanhar cidades ↗</a></div>
 </aside></div>
@@ -861,7 +958,7 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
 
     'noticia.html': r"""
 {% extends 'portal_base.html' %}
-{% from 'portal_macros.html' import card, ad, ads_top, instagram_icon %}
+{% from 'portal_macros.html' import card, ad, ads_top, ads_side, instagram_icon %}
 {% block title %}{{ noticia.titulo }} | Diário da Notícia{% endblock %}
 {% block description %}{{ noticia.resumo or noticia.titulo }}{% endblock %}
 {% block meta %}
@@ -897,7 +994,7 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
 </section>
 {% if patrocinadores %}<div class="inline-ad">{{ ad(patrocinadores[0]) }}</div>{% endif %}
 {% if relacionadas %}<section><div class="section-heading"><h2>Leia também</h2><a href="{{ url_for('inicio',categoria=noticia.categoria) }}">{{ noticia.categoria }} ↗</a></div><div class="related-grid">{% for n in relacionadas %}{{ card(n) }}{% endfor %}</div></section>{% endif %}
-</article><aside class="sidebar" aria-label="Mais notícias e patrocinadores">{% if patrocinadores %}<h2 class="side-title">Patrocinadores</h2>{% for p in patrocinadores %}{{ ad(p,true) }}{% endfor %}{% endif %}{% if ultimas %}<h2 class="side-title">Mais recentes</h2><div class="latest-list">{% for n in ultimas %}{{ card(n,true) }}{% endfor %}</div>{% endif %}</aside></div>
+</article><aside class="sidebar" aria-label="Mais notícias e patrocinadores">{% if patrocinadores %}<h2 class="side-title">Patrocinadores</h2>{{ ads_side(patrocinadores) }}{% endif %}{% if ultimas %}<h2 class="side-title">Mais recentes</h2><div class="latest-list">{% for n in ultimas %}{{ card(n,true) }}{% endfor %}</div>{% endif %}</aside></div>
 {% endblock %}
 {% block scripts %}<script>
 (function(){
