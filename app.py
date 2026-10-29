@@ -855,23 +855,55 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
  const slides=Array.from(area.querySelectorAll('[data-slide]'));
  if(slides.length<2)return;
  let index=0;
+ const count=area.querySelector('[data-count]');
+ const interval=area.classList.contains('ad-side-rotation')?6500:5000;
+ const prev=area.querySelector('[data-prev]');
+ const next=area.querySelector('[data-next]');
+ let mouseOver=false;
+ let timer=null;
+
  function show(n){
-   index=(n+slides.length)%slides.length;
-   slides.forEach((s,i)=>s.hidden=i!==index);
-   const count=area.querySelector('[data-count]');
-   if(count)count.textContent=(index+1)+' / '+slides.length;
+  index=(n+slides.length)%slides.length;
+  slides.forEach(function(slide,i){slide.hidden=i!==index;});
+  if(count)count.textContent=(index+1)+' / '+slides.length;
  }
- area.querySelector('[data-prev]').addEventListener('click',()=>show(index-1));
- area.querySelector('[data-next]').addEventListener('click',()=>show(index+1));
- let paused=false;
- area.addEventListener('mouseenter',()=>paused=true);
- area.addEventListener('mouseleave',()=>paused=false);
- area.addEventListener('focusin',()=>paused=true);
- area.addEventListener('focusout',()=>paused=area.contains(document.activeElement));
- const reducedMotion=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- if(!reducedMotion)window.setInterval(function(){
-   if(!paused && !document.hidden)show(index+1);
- },area.classList.contains('ad-side-rotation')?6500:5000);
+
+ function autoAdvance(){
+  if(!document.hidden && !mouseOver)show(index+1);
+ }
+
+ // Alguns celulares simulam 'mouseenter' após um toque e nunca disparam
+ // 'mouseleave'. Somente mouse real pode pausar a rotação automática.
+ const supportsHover=window.matchMedia &&
+  window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+ if(supportsHover){
+  area.addEventListener('pointerenter',function(event){
+   if(event.pointerType==='mouse')mouseOver=true;
+  });
+  area.addEventListener('pointerleave',function(event){
+   if(event.pointerType==='mouse')mouseOver=false;
+  });
+ }
+
+ function restart(){
+  if(timer!==null)window.clearInterval(timer);
+  timer=window.setInterval(autoAdvance,interval);
+ }
+
+ if(prev)prev.addEventListener('click',function(){
+  show(index-1);
+  restart();
+ });
+ if(next)next.addEventListener('click',function(){
+  show(index+1);
+  restart();
+ });
+
+ document.addEventListener('visibilitychange',function(){
+  if(!document.hidden)restart();
+ });
+ show(0);
+ restart();
 });
 </script>
 <script>
