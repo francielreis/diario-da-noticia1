@@ -846,8 +846,9 @@ PORTAL_CSS = r"""
 .footer-sponsors-header p{color:#aeb7c3;font-size:13px;line-height:1.6;margin:0}
 .footer-advertise{white-space:nowrap;border:1px solid #d74053;background:#bb1a30;color:#fff;border-radius:5px;padding:12px 15px;font-size:12px;font-weight:800;text-align:center}
 .footer-advertise:hover{background:#d72b43}
-.footer-sponsor-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.footer-sponsor-card{background:#fff;border:1px solid #414751;border-radius:8px;overflow:hidden;min-width:0;color:#1d2330;transition:transform .2s,box-shadow .2s}
+.footer-sponsor-board{background:#f8f9fc;border:1px solid #e5e8ed;border-radius:12px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.footer-sponsor-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.footer-sponsor-card{background:#fff;border:1px solid #e1e4ea;border-radius:8px;overflow:hidden;min-width:0;color:#1d2330;transition:transform .2s,box-shadow .2s}
 .footer-sponsor-card:hover{transform:translateY(-3px);box-shadow:0 12px 24px rgba(0,0,0,.19)}
 .footer-sponsor-content{display:block;height:100%;color:inherit}
 .footer-sponsor-image{display:flex;align-items:center;justify-content:center;height:150px;background:#fff;padding:14px}
@@ -856,7 +857,6 @@ PORTAL_CSS = r"""
 .footer-sponsor-caption{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:12px 15px;border-top:1px solid #e9ebef;background:#f7f8fa}
 .footer-sponsor-caption strong{font-size:12px;line-height:1.45;font-weight:800;overflow-wrap:anywhere}
 .footer-sponsor-caption span{flex-shrink:0;color:#ba1828;font-weight:800}
-.footer-swipe-hint{display:none}
 .footer-sponsor-empty{font-size:13px;color:#bfc7d2;border:1px dashed #505866;border-radius:6px;padding:20px}
 .footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;border-top:1px solid #343944;margin:0;padding:20px 0 0;color:#9fa8b6;font-size:11px}
 .footer-bottom-links{display:flex;flex-wrap:wrap;gap:14px 24px}
@@ -883,10 +883,14 @@ PORTAL_CSS = r"""
  .footer-sponsors-header{align-items:flex-start;flex-direction:column;gap:15px}
  .footer-sponsors-header p{font-size:12px}
  .footer-advertise{padding:10px 13px}
- .footer-sponsor-grid{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(215px,76vw);grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;gap:12px;padding:2px 1px 12px;scrollbar-width:thin}
- .footer-sponsor-card{scroll-snap-align:start}
- .footer-sponsor-image{height:135px}
- .footer-swipe-hint{display:block;color:#aab4c0;font-size:11px;text-align:center;margin:9px 0 0}
+ .footer-sponsor-board{padding:11px;border-radius:10px}
+ .footer-sponsor-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row;gap:10px;overflow:visible}
+ .footer-sponsor-card{width:100%;min-width:0}
+ .footer-sponsor-card:last-child:nth-child(odd):not(:first-child){grid-column:1/-1;justify-self:center;width:calc((100% - 10px)/2)}
+ .footer-sponsor-image{height:104px;padding:8px}
+ .footer-sponsor-caption{min-height:60px;padding:9px 8px;gap:3px}
+ .footer-sponsor-caption strong{font-size:11px}
+ .footer-sponsor-image span{font-size:12px}
  .footer-bottom{gap:14px;padding-top:19px;flex-direction:column;align-items:flex-start}
  .footer-bottom-links{gap:16px}
  .footer-weather-credit{margin-top:17px;font-size:9px}
@@ -953,7 +957,8 @@ TEMPLATES = {
       <a class="footer-advertise" href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">Anuncie sua marca <span aria-hidden="true">↗</span></a>
     </div>
     {% if patrocinadores %}
-    <div class="footer-sponsor-grid">
+    <div class="footer-sponsor-board" aria-label="Quadro dos patrocinadores">
+      <div class="footer-sponsor-grid">
       {% for p in patrocinadores %}
       <article class="footer-sponsor-card">
         {% if p.link %}<a class="footer-sponsor-content" href="{{ p.link }}" target="_blank" rel="noopener noreferrer sponsored" aria-label="Visitar {{ p.nome }}">{% else %}<div class="footer-sponsor-content">{% endif %}
@@ -964,8 +969,8 @@ TEMPLATES = {
         {% if p.link %}</a>{% else %}</div>{% endif %}
       </article>
       {% endfor %}
+      </div>
     </div>
-    <p class="footer-swipe-hint">Deslize para conhecer nossos parceiros <span aria-hidden="true">→</span></p>
     {% else %}
     <p class="footer-sponsor-empty">Sua empresa pode fazer parte deste espaço. Entre em contato para anunciar.</p>
     {% endif %}
