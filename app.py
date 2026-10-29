@@ -813,11 +813,60 @@ def api_tempo():
             dados_tempo = periodo['data']
             proximas = dados_tempo.get('next_1_hours') or dados_tempo.get('next_6_hours') or {}
             temperatura = float(dados_tempo['instant']['details']['air_temperature'])
+            # Agrupa a previsão horária no fuso local do Piauí.
+            # Min./máx. de hoje são calculadas a partir dos horários
+            # ainda disponíveis na previsão, sem inventar dados passados.
+            dias = {}
+            for item in previsao['properties'].get('timeseries', []):
+                local = datetime.fromisoformat(
+                    item['time'].replace('Z', '+00:00')
+                ).astimezone(ZoneInfo('America/Fortaleza'))
+                data_local = local.date()
+                detalhes = item['data'].get('instant', {}).get('details', {})
+                temp_hora = detalhes.get('air_temperature')
+                if temp_hora is None:
+                    continue
+                simbolo = (
+                    item['data'].get('next_1_hours')
+                    or item['data'].get('next_6_hours')
+                    or item['data'].get('next_12_hours')
+                    or {}
+                ).get('summary', {}).get('symbol_code', '')
+                dia = dias.setdefault(data_local, {
+                    'temperaturas': [], 'condicao': '', 'hora_simbolo': 99
+                })
+                dia['temperaturas'].append(float(temp_hora))
+                distancia_meio_dia = abs(local.hour - 12)
+                if simbolo and distancia_meio_dia < dia['hora_simbolo']:
+                    dia['condicao'] = simbolo
+                    dia['hora_simbolo'] = distancia_meio_dia
+
+            hoje_local = datetime.now(ZoneInfo('America/Fortaleza')).date()
+            semana = ('Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom')
+            previsao_dias = []
+            for data_local, valores in sorted(dias.items()):
+                if data_local < hoje_local:
+                    continue
+                deslocamento = (data_local - hoje_local).days
+                if deslocamento > 2:
+                    break
+                temperaturas = valores['temperaturas']
+                previsao_dias.append({
+                    'dia': 'Hoje' if deslocamento == 0 else (
+                        'Amanhã' if deslocamento == 1 else semana[data_local.weekday()]
+                    ),
+                    'data': data_local.strftime('%d/%m'),
+                    'min': round(min(temperaturas)),
+                    'max': round(max(temperaturas)),
+                    'condicao': valores['condicao']
+                })
+
             clima = {
                 'cidade': 'Picos, PI',
                 'temperatura': round(temperatura),
                 'condicao': proximas.get('summary', {}).get('symbol_code', ''),
-                'previsto_para': periodo.get('time')
+                'previsto_para': periodo.get('time'),
+                'previsao': previsao_dias
             }
             _clima_cache.update({'dados': clima, 'expira_em': time.monotonic() + 1200})
             return jsonify(clima)
@@ -850,6 +899,35 @@ PORTAL_CSS = r"""
 @keyframes ad-enter{from{opacity:.4}to{opacity:1}}
 @media(max-width:740px){.topline .wrap{gap:8px;justify-content:space-between}.weather-widget{padding-left:0;border:0}.weather-widget .weather-temp{font-size:15px}.weather-widget .weather-city{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.ad-top [data-slide],.ad-side-rotation [data-slide]{animation:none}}
+
+
+/* Previsão de três dias no topo */
+.weather-forecast{background:#f7f8fa;border-bottom:1px solid #e4e6e9;color:#23262d}
+.weather-forecast .wrap{padding-top:12px;padding-bottom:12px}
+.weather-forecast-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}
+.weather-forecast-heading>span{font-size:10px;color:#b7192e;font-weight:850;letter-spacing:1.1px}
+.weather-forecast-heading strong{color:#444d58;font-weight:700}
+.weather-forecast-heading small{font-size:10px;color:#697483}
+.weather-forecast-days{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.weather-forecast-day{display:flex;align-items:center;justify-content:center;gap:12px;background:#fff;border:1px solid #e4e6ed;border-radius:7px;padding:10px 12px;min-width:0}
+.weather-forecast-day .weather-day-icon{font-size:27px;flex-shrink:0;line-height:1}
+.weather-forecast-day .weather-day-details{display:flex;flex-direction:column;gap:2px;min-width:0}
+.weather-forecast-day .weather-day-title{font-size:12px;font-weight:800;color:#2e343d}
+.weather-forecast-day .weather-day-range{font-size:12px;white-space:nowrap;color:#424b56}
+.weather-forecast-day .weather-day-range strong{font-size:14px;color:#b7192e}
+.weather-forecast-loading{grid-column:1/-1;padding:5px 2px;margin:0;color:#657182;font-size:11px}
+@media(max-width:600px){
+ .weather-forecast .wrap{padding-top:10px;padding-bottom:11px}
+ .weather-forecast-heading{margin-bottom:7px}
+ .weather-forecast-heading>span{font-size:9px;letter-spacing:.55px}
+ .weather-forecast-heading small{font-size:9px}
+ .weather-forecast-days{gap:6px}
+ .weather-forecast-day{flex-direction:column;gap:5px;text-align:center;padding:8px 2px 9px;border-radius:6px}
+ .weather-forecast-day .weather-day-icon{font-size:23px}
+ .weather-forecast-day .weather-day-title{font-size:11px}
+ .weather-forecast-day .weather-day-range{font-size:10px}
+ .weather-forecast-day .weather-day-range strong{font-size:12px}
+}
 
 /* Identificação da empresa responsável pelo desenvolvimento */
 .developer-credit-top{background:#17191f;border-bottom:2px solid #ba1828;color:#cbd0d9;padding:8px 16px;text-align:center;font-size:11px;letter-spacing:.18px;line-height:1.5}
@@ -959,6 +1037,17 @@ TEMPLATES = {
   <span>Tecnologia desenvolvida por <strong>Reis Tech e Software</strong></span>
 </div>
 <div class="topline"><div class="wrap"><time>{{ hoje_portal }}</time><div class="weather-widget" aria-label="Previsão do tempo em Picos, PI"><span class="weather-icon" id="weather-icon" aria-hidden="true">🌤️</span><span class="weather-temp" id="weather-temperature">--°C</span><span class="weather-city">Picos, PI</span></div><span>Piauí · Brasil · Informação e credibilidade</span><a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram do Diário da Notícia">{{ instagram_icon() }} Instagram ↗</a><a href="{{ url_for('admin') }}">Área da redação</a></div></div>
+<section class="weather-forecast" aria-label="Previsão do tempo para Picos, Piauí">
+  <div class="wrap">
+    <div class="weather-forecast-heading">
+      <span>PREVISÃO DO TEMPO <strong>· PICOS (PI)</strong></span>
+      <small>Próximos 3 dias</small>
+    </div>
+    <div class="weather-forecast-days" id="weather-forecast-days" aria-live="polite">
+      <p class="weather-forecast-loading">Carregando previsão...</p>
+    </div>
+  </div>
+</section>
 <header class="masthead wrap">
 <a class="brand" href="{{ url_for('inicio') }}" aria-label="Diário da Notícia — início"><span class="brand-over">DIÁRIO DA</span><strong>NOTÍCIA<span class="brand-dot">.</span></strong><span class="brand-tag">INFORMAÇÃO EM PRIMEIRO LUGAR</span></a>
 <form class="search" action="{{ url_for('inicio') }}" method="get" role="search"><label class="sr-only" for="busca-portal">Buscar notícias</label><input id="busca-portal" type="search" name="q" value="{{ busca|default('') }}" placeholder="O que você quer saber?" maxlength="200"><button type="submit">Buscar <span aria-hidden="true">↗</span></button></form>
@@ -1115,7 +1204,49 @@ document.querySelectorAll('[data-carousel]').forEach(function(area){
    else if(symbol.includes('clearsky'))emoji='☀️';
    temperature.textContent=Math.round(data.temperatura)+'°C';
    icon.textContent=emoji;
-  }catch(error){temperature.title='Previsão indisponível no momento';}
+
+   const forecast=document.getElementById('weather-forecast-days');
+   if(forecast && Array.isArray(data.previsao) && data.previsao.length){
+     const icons=function(symbol){
+       symbol=String(symbol||'').toLowerCase();
+       if(symbol.includes('thunder'))return '⛈️';
+       if(symbol.includes('rain')||symbol.includes('sleet'))return '🌧️';
+       if(symbol.includes('snow'))return '❄️';
+       if(symbol.includes('fog'))return '🌫️';
+       if(symbol.includes('cloud'))return '☁️';
+       if(symbol.includes('clearsky'))return '☀️';
+       return '🌤️';
+     };
+     const fragment=document.createDocumentFragment();
+     data.previsao.slice(0,3).forEach(function(day){
+       if(!Number.isFinite(day.min)||!Number.isFinite(day.max))return;
+       const card=document.createElement('div');
+       card.className='weather-forecast-day';
+       const picture=document.createElement('span');
+       picture.className='weather-day-icon';
+       picture.setAttribute('aria-hidden','true');
+       picture.textContent=icons(day.condicao);
+       const info=document.createElement('div');
+       info.className='weather-day-details';
+       const title=document.createElement('span');
+       title.className='weather-day-title';
+       title.textContent=day.dia+' · '+day.data;
+       const temps=document.createElement('span');
+       temps.className='weather-day-range';
+       const max=document.createElement('strong');
+       max.textContent=day.max+'°';
+       temps.append(max,document.createTextNode(' / '+day.min+'°'));
+       info.append(title,temps);
+       card.append(picture,info);
+       fragment.appendChild(card);
+     });
+     if(fragment.childNodes.length)forecast.replaceChildren(fragment);
+   }
+  }catch(error){
+   temperature.title='Previsão indisponível no momento';
+   const forecast=document.getElementById('weather-forecast-days');
+   if(forecast && forecast.querySelector('.weather-forecast-loading'))forecast.querySelector('.weather-forecast-loading').textContent='Previsão temporariamente indisponível';
+  }
  }
  updateWeather();
  window.setInterval(updateWeather,900000);
